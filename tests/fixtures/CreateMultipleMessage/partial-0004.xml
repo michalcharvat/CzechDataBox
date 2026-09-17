@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:CreateMultipleMessageResponse>
+      <p:dmMultipleStatus>
+        <p:dmSingleStatus>
+          <p:dmID>7654322</p:dmID>
+          <p:dmStatus><p:dmStatusCode>0000</p:dmStatusCode><p:dmStatusMessage>Provedeno úspěšně.</p:dmStatusMessage></p:dmStatus>
+        </p:dmSingleStatus>
+        <p:dmSingleStatus>
+          <p:dmStatus><p:dmStatusCode>1214</p:dmStatusCode><p:dmStatusMessage>Datová schránka adresáta je znepřístupněna.</p:dmStatusMessage></p:dmStatus>
+        </p:dmSingleStatus>
+      </p:dmMultipleStatus>
+      <p:dmStatus><p:dmStatusCode>0004</p:dmStatusCode><p:dmStatusMessage>Chyba při odeslání některé ze zpráv.</p:dmStatusMessage></p:dmStatus>
+    </p:CreateMultipleMessageResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

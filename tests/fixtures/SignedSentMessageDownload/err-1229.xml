@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:SignedSentMessageDownloadResponse>
+      <p:dmStatus><p:dmStatusCode>1229</p:dmStatusCode><p:dmStatusMessage>Zprávu zatím nelze stáhnout, dosud nebyla dodána adresátovi.</p:dmStatusMessage></p:dmStatus>
+    </p:SignedSentMessageDownloadResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:SignedMessageDownloadResponse>
+      <p:dmSignature>MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwGggCSABA==</p:dmSignature>
+      <p:dmStatus><p:dmStatusCode>0000</p:dmStatusCode><p:dmStatusMessage>Provedeno úspěšně.</p:dmStatusMessage></p:dmStatus>
+    </p:SignedMessageDownloadResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
