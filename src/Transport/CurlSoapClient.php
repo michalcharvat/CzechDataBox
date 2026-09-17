@@ -18,7 +18,7 @@ class CurlSoapClient extends \SoapClient
 {
     private ?IsdsException $transportError = null;
     private string $currentOperation = '';
-    private ?string $certFile = null;
+    private ?CertificateFile $certFile = null;
 
     public function __construct(
         string $wsdl,
@@ -52,28 +52,15 @@ class CurlSoapClient extends \SoapClient
     public function __doRequest(#[\SensitiveParameter] string $request, string $location, string $action, int $version, bool $oneWay = false): ?string
     {
         $ch = curl_init($this->location);
-        $headers = ['Content-Type: text/xml; charset=utf-8', 'SOAPAction: "' . $action . '"'];
         $opts = [
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $request,
-            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_HTTPHEADER => ['Content-Type: text/xml; charset=utf-8', 'SOAPAction: "' . $action . '"'],
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => $this->options->connectTimeout,
             CURLOPT_TIMEOUT => $this->options->timeout,
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
-            CURLOPT_CAINFO => $this->options->caFile(),
-            CURLOPT_USERAGENT => $this->options->userAgent,
         ];
-        if ($basic = $this->credentials->basicAuth()) {
-            $opts[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
-            $opts[CURLOPT_USERPWD] = $basic[0] . ':' . $basic[1];
-        }
-        if ($cert = $this->credentials->certificate()) {
-            $opts += $this->certificateOptions($cert->pem, $cert->passphrase);
-        }
-        curl_setopt_array($ch, $opts);
+        curl_setopt_array($ch, $opts + CurlAuthOptions::tls($this->options)
+            + CurlAuthOptions::for($this->credentials, $this->options, $this->certFile));
         $body = curl_exec($ch);
         $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
         $errno = curl_errno($ch);
@@ -88,43 +75,5 @@ class CurlSoapClient extends \SoapClient
                 . '</SOAP-ENV:Fault></SOAP-ENV:Body></SOAP-ENV:Envelope>';
         }
         return $body;
-    }
-
-    /** @return array<int, mixed> */
-    private function certificateOptions(string $pem, ?string $passphrase): array
-    {
-        $o = [CURLOPT_SSLCERTTYPE => 'PEM', CURLOPT_SSLKEYTYPE => 'PEM'];
-        if (defined('CURLOPT_SSLCERT_BLOB') && defined('CURLOPT_SSLKEY_BLOB')) {
-            $o[CURLOPT_SSLCERT_BLOB] = $pem;
-            $o[CURLOPT_SSLKEY_BLOB] = $pem;
-        } else {
-            $o[CURLOPT_SSLCERT] = $this->certFile();
-        }
-        if ($passphrase !== null) {
-            $o[CURLOPT_KEYPASSWD] = $passphrase;
-        }
-        return $o;
-    }
-
-    private function certFile(): string
-    {
-        if ($this->certFile === null) {
-            $cert = $this->credentials->certificate();
-            $path = tempnam($this->options->tempDir(), 'isds-cert-');
-            if ($path === false || $cert === null) {
-                throw new \RuntimeException('Cannot create certificate temp file');
-            }
-            chmod($path, 0600);
-            file_put_contents($path, $cert->pem);
-            $this->certFile = $path;
-        }
-        return $this->certFile;
-    }
-
-    public function __destruct()
-    {
-        if ($this->certFile !== null && is_file($this->certFile)) {
-            unlink($this->certFile);
-        }
     }
 }
