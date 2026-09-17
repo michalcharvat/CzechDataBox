@@ -1,7 +1,7 @@
 vendor/
-.git/
 .idea/
-config.ini
+composer.lock
+.phpunit.cache/
 .phpunit.result.cache
-.phpcs-cache
 phpunit.xml
+phpstan.neon

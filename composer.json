@@ -1,57 +1,31 @@
 {
-    "name": "dfridrich/czech-data-box",
-    "type": "library",
-    "description": "Knihovna pro komunikaci s datovou schránkou v PHP.",
-    "keywords": [
-        "php",
-        "library",
-        "ISDS",
-        "Datové schránky"
-    ],
-    "homepage": "https://github.com/dfridrich/CzechDataBox",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Dennis Fridrich",
-            "email": "fridrich.dennis@gmail.com"
-        }
-    ],
-    "require": {
-        "php": "^7.2|^8.1",
-        "ext-soap": "*"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^8|^9",
-        "symfony/var-dumper": "^5|^6|^7",
-        "phpstan/phpstan": "^1.10",
-        "squizlabs/php_codesniffer": "^3.7"
-    },
-    "autoload": {
-        "psr-4": {
-            "Defr\\CzechDataBox\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Defr\\CzechDataBox\\": "tests/"
-        }
-    },
-    "scripts": {
-        "phpcs": "@php -d memor_limit=2G vendor/bin/phpcs -sp",
-        "phpcbf": "@php -d memor_limit=2G vendor/bin/phpcbf -sp",
-        "phpstan": [
-            "Composer\\Config::disableProcessTimeout",
-            "@php -d memory_limit=2G vendor/bin/phpstan analyse -c phpstan.neon"
-        ],
-        "check": [
-            "@phpcs",
-            "@phpstan"
-        ]
-
-    },
-    "config": {
-        "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true
-        }
-    }
+  "name": "michalcharvat/czech-data-box",
+  "type": "library",
+  "description": "Client for the Czech data box information system (ISDS) web services, WSDL 3.10.",
+  "keywords": ["ISDS", "datové schránky", "datovka", "ZFO"],
+  "license": "MIT",
+  "authors": [
+    {"name": "Michal Charvát", "email": "info@michalcharvat.cz"},
+    {"name": "Dennis Fridrich", "email": "fridrich.dennis@gmail.com"}
+  ],
+  "require": {
+    "php": ">=8.1",
+    "ext-soap": "*",
+    "ext-openssl": "*",
+    "ext-curl": "*",
+    "ext-xml": "*",
+    "ext-dom": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.5",
+    "phpstan/phpstan": "^1.11"
+  },
+  "autoload": {"psr-4": {"MichalCharvat\\CzechDataBox\\": "src/"}},
+  "autoload-dev": {"psr-4": {"MichalCharvat\\CzechDataBox\\Tests\\": "tests/"}},
+  "scripts": {
+    "test": "phpunit --testsuite unit",
+    "test-live": "phpunit --testsuite live",
+    "analyse": "phpstan analyse"
+  },
+  "config": {"sort-packages": true}
 }

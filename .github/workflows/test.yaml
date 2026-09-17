@@ -10,42 +10,25 @@ on:
 jobs:
     run:
         runs-on: ubuntu-latest
-        continue-on-error: ${{ matrix.experimental }}
         strategy:
             fail-fast: false
             matrix:
-                php:
-                    - 7.3
-                    - 7.4
-                    - 8.1
-                    - 8.2
-                    - 8.3
-                    - 8.4
-                experimental: [false]
-                include:
-                    - php: '7.2'
-                      experimental: true
+                php: ['8.1', '8.2', '8.3', '8.4']
 
         name: PHP ${{ matrix.php }} test
 
         steps:
-
-            -   uses: actions/checkout@v3
+            -   uses: actions/checkout@v4
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php }}
-                    tools: phpunit:9.6
+                    extensions: soap, openssl, curl, xml, dom
                     coverage: none
 
             -   name: Install dependencies
-                run: composer install --prefer-dist --dev
+                run: composer install --prefer-dist
 
-            -   run: composer check
-
-            -   run: phpunit
-                env:
-                    DATABOX_LOGIN: ${{ secrets.DATABOX_LOGIN }}
-                    DATABOX_PASSWORD: ${{ secrets.DATABOX_PASSWORD }}
-                    DATABOX_PRODUCTION: ${{ vars.DATABOX_PRODUCTION }}
+            -   run: composer test
+            -   run: composer analyse
