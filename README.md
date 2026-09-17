@@ -1,151 +1,185 @@
-# CzechDataBox
+# czech-data-box
 
-[![PHPUnit](https://github.com/dfridrich/CzechDataBox/actions/workflows/test.yaml/badge.svg)](https://github.com/dfridrich/CzechDataBox/actions/workflows/test.yaml)
-[![Latest Stable Version](https://poser.pugx.org/dfridrich/czech-data-box/v/stable)](https://packagist.org/packages/dfridrich/czech-data-box)
-[![Total Downloads](https://poser.pugx.org/dfridrich/czech-data-box/downloads)](https://packagist.org/packages/dfridrich/czech-data-box)
-[![Monthly Downloads](https://poser.pugx.org/dfridrich/czech-data-box/d/monthly)](https://packagist.org/packages/dfridrich/czech-data-box)
-[![License](https://poser.pugx.org/dfridrich/czech-data-box/license)](https://packagist.org/packages/dfridrich/czech-data-box)
+PHP client for the Czech data box information system (ISDS) web services, **WSDL 3.10**
+(Provozní řád ISDS 26. 6. 2026, WS manuals 3.8.1).
 
+Version 2 is a rewrite: typed DTOs, a typed exception hierarchy, every WSDL operation, a streaming
+MTOM transport for large messages (VoDZ) and a hardened ZFO reader. No runtime dependencies beyond
+PHP extensions. Upgrading from 1.x: see [UPGRADE-2.0.md](UPGRADE-2.0.md).
 
-Knihovna pro komunikaci s datovou schránkou v PHP.
+## Installation
 
-![Logo datových schránek](Resources/logo.png)
-
-## Instalace pomocí Composeru
-
-`composer require dfridrich/czech-data-box`
-
-## Příklady
-
-Níže uvedené příklady používají `Defr\CzechDataBox\DataBoxSimpleApi`, které nabízí jednodušší přístup k datové schránce. Pokud chcete použít standardní přístup, můžete využít tyto web services:
-
-```php
-<?php
-
-$dataBox->DmOperationsWebService();
-$dataBox->DmInfoWebService();
-$dataBox->DataBoxSearch();
-$dataBox->DataBoxAccess();
-$dataBox->IsdsStat();
+```bash
+composer require michalcharvat/czech-data-box:^2.0
 ```
 
-### Připojení k datové schránce
+Until the package is on Packagist, add the repository:
 
-```php
-<?php
-
-require "../vendor/autoload.php";
-
-use Defr\CzechDataBox\DataBox;
-
-$dataBox = new DataBox();
-$dataBox->loginWithUsernameAndPassword("login", "heslo", true); // Pro ostrou verzi
-$dataBox->loginWithUsernameAndPassword("login", "heslo", false); // Pro verzi s testovacím přístupem
-$dataBox->loginWithCertificateAndPassword("certifikat.cer"); // Nebo pouzijte prihlaseni certifikatem
-
-/** @var \Defr\CzechDataBox\DataBoxSimpleApi $simpleApi */
-$simpleApi = $dataBox->getSimpleApi();
-```
-
-### Informace o datové schránce
-
-```php
-$simpleApi->getDataBoxInfo(); // vrací Defr\CzechDataBox\Api\tDbOwnerInfo
-```
-
-### Informace o přihlášeném uživateli
-
-```php
-$simpleApi->getUserInfo(); // Vrací Defr\CzechDataBox\Api\tDbUserInfo;
-```
-
-### Informace o expiraci hesla
-
-```php
-$simpleApi->getPasswordExpires(); // \DateTime|null
-```
-
-### Stažení přijatých zpráv
-
-```php
-$days = 90;
-$limit = 1000;
-
-$messages = $simpleApi->getListOfReceivedMessages($days, $limit);
-foreach ($messages as $message) {
-    echo "<h2>Msg# " . $message->getDmID() . "</h2>";
-    // Defr\CzechDataBox\Api\tIdDm
-    var_dump($message);
-
-    echo "<h3>Signed message</h3>";
-    // Defr\CzechDataBox\DataBoxMessageFile
-    var_dump($simpleApi->downloadSignedReceivedMessage($message->getDmID()));
-
-    echo "<h3>Delivery info</h3>";
-    // Defr\CzechDataBox\DataBoxMessageFile
-    var_dump($simpleApi->downloadDeliveryInfo($message->getDmID()));
-
-    echo "<h3>Attachments</h3>";
-    // Defr\CzechDataBox\DataBoxMessageAttachment[]
-    var_dump($simpleApi->getReceivedDataMessageAttachments($message->getDmID()));
+```json
+{
+  "repositories": [
+    {"type": "vcs", "url": "https://github.com/michalcharvat/CzechDataBox.git"}
+  ]
 }
 ```
 
-### Stažení odeslaných zpráv
+## Requirements
+
+PHP ≥ 8.1 with `soap`, `openssl`, `curl`, `xml` and `dom`. ISDS requires TLS 1.2+.
+The bundled `resources/ca/isds-ca-bundle.pem` is used for peer verification
+(DigiCert Global Root G2 — the current ISDS chain — plus PostSignum Root QCA).
+
+## Quick start
 
 ```php
-$messages = $simpleApi->getListOfSentMessages();
-foreach ($messages as $message) {
-    echo "<h2>Msg# " . $message->getDmID() . "</h2>";
-    var_dump($message);
+use MichalCharvat\CzechDataBox\{Connection, Environment};
+use MichalCharvat\CzechDataBox\Credentials\PasswordCredentials;
+use MichalCharvat\CzechDataBox\Input\{FileInput, ListFilter, MessageEnvelopeInput};
 
-    echo "<h3>Signed message</h3>";
-    var_dump($simpleApi->downloadSignedSentMessage($message->getDmID()));
+$isds = new Connection(Environment::Production, new PasswordCredentials('login', 'password'));
 
-    echo "<h3>Delivery info</h3>";
-    var_dump($simpleApi->downloadDeliveryInfo($message->getDmID()));
+// who am I
+$owner = $isds->access()->getOwnerInfoFromLogin2();
+echo $owner->dbID, ' ', $owner->displayName(), PHP_EOL;
+
+// received messages of the last 7 days — WARNING: this call DELIVERS them (see below)
+$records = $isds->messageInfo()->getListOfReceivedMessages(
+    new ListFilter(new DateTimeImmutable('-7 days'), new DateTimeImmutable(), limit: 100),
+);
+
+// download one with its attachments
+$message = $isds->messageOperations()->messageDownload($records[0]->dmID);
+foreach ($message->files as $file) {
+    file_put_contents('/tmp/' . $file->dmFileDescr, $file->content);
 }
 
+// send
+$created = $isds->messageOperations()->createMessage(
+    new MessageEnvelopeInput(dmAnnotation: 'Faktura 2026/15', dbIDRecipient: 'abc1234'),
+    [new FileInput(file_get_contents('invoice.pdf'), 'application/pdf', 'invoice.pdf', 'main')],
+);
+echo $created->dmID, PHP_EOL;
 ```
 
-### Nalezení datové schránky na základě jejího ID
+System-certificate login (records-management applications), hosted variants and OTP accounts:
 
 ```php
-$simpleApi->findDataBoxById('wucb4dd');
+use MichalCharvat\CzechDataBox\Credentials\{CertificateAndPasswordCredentials, ClientCertificate,
+    HostedRecordsServiceCredentials, SystemCertificateCredentials};
+
+$cert = new ClientCertificate(file_get_contents('spisovka.pem'), 'passphrase');
+$isds = new Connection(Environment::Production, new SystemCertificateCredentials($cert));
+// or new CertificateAndPasswordCredentials($cert, 'login', 'password')
+// or new HostedRecordsServiceCredentials($cert, 'abc1234')   // box id goes in the Basic-auth user field
 ```
 
+The endpoint URL follows from environment + login kind (`Endpoint\EndpointTable`). The pre-2026 host
+names still work: `new Connection(..., legacyDomain: true)` uses mojedatovaschranka.cz / czebox.cz.
+Timeouts, a different CA file or user agent: pass a `Transport\TransportOptions`.
 
-### Odeslání datové zprávy včetně přílohy
+## Services
 
-Datová schránka nepřijímá všechny typy souborů, testováno na pdf, jpg, png (Většina binary typů by měla projít).
-TXT soubory lze odeslat pouze, kdyz se 2x base64 encodují, výsledkem je přijatá datová zpráva s base64 encodovaným contentem uvnitř txt souboru
+| `Connection` method | Endpoint | WSDL | Contents |
+|---|---|---|---|
+| `messageOperations()` | `…/DS/dz` | dm_operations | CreateMessage, CreateMultipleMessage, MessageDownload, Signed(Sent)MessageDownload, AuthenticateMessage, Re-signISDSDocument, DummyOperation |
+| `messageInfo()` | `…/DS/dx` | dm_info | message lists, (Sent)MessageEnvelopeDownload, MarkMessageAsDownloaded, Get(Signed)DeliveryInfo, GetMessageStateChanges, GetMessageAuthor(2), EraseMessage, GetListOfErasedMessages + PickUpAsyncResponse, notifications, SuspMessageReport, VerifyMessage |
+| `search()` | `…/DS/df` | db_search | FindDataBox(2), ISDSSearch2/3, CheckDataBox, GetDataBoxActivityStatus, GetDataBoxAddress, GetDataBoxList, FindPersonalDataBox, PDZInfo, PDZSendInfo, DataBoxCreditInfo, DTInfo, GetConstants |
+| `access()` | `…/DS/DsManage` | db_access | GetOwnerInfoFromLogin(2), GetUserInfoFromLogin(2), GetPasswordInfo, ChangeISDSPassword |
+| `manipulations()` | `…/DS/DsManage` | db_manipulations | box and user administration (data providers) |
+| `bigMessages()` | `ws2 …/DS/vodz` | dm_VoDZ | UploadAttachment, CreateBigMessage, BigMessageDownload, Signed(Sent)BigMessageDownload, DownloadAttachment, AuthenticateBigMessage |
+| `archive()` | `ws2 …/DS/arch` | dm_arch | ArchiveISDSDocument (re-stamping) |
+| `passwordChange()` | `www…/asws/changePassword` | ChangePassword | ChangePasswordOTP, SendSMSCode |
+
+`tests/Unit/OperationCoverageTest.php` fails if any of the 78 WSDL operations loses its method.
+
+### Delivery semantics — read this
+
+`GetListOfReceivedMessages` **legally delivers** every listed message when the login holds
+`PRIVIL_READ_NON_PERSONAL` or `PRIVIL_READ_ALL` (`$userInfo->privileges()->delivers()`). There is no
+way to list without delivering under such a login; use a `PRIVIL_VIEW_INFO`-only login to look
+without delivering. `MarkMessageAsDownloaded` only sets state 7 and has no legal effect.
+`ConfirmDelivery` no longer exists in ISDS (removed in WSDL 2.33) and is not offered by this library.
+
+## Errors
+
+Everything throws `Exception\IsdsException` (extends `RuntimeException`) carrying `$isdsCode`,
+`$isdsMessage` and `$operation`. Subclasses: `AuthenticationFailed` (HTTP 401/403),
+`RateLimited` (3008, 3009, 3013), `DeliveryInProgress` (3006), `NotYetDelivered` (1222),
+`NotAvailableYet` (1229, 2352), `WrongMessageKind` (1281), `MessageNotFound` (1211, 1600),
+`MessageErased` (1219), `ServiceUnavailable` (network, timeout, unexpected HTTP status),
+`InvalidZfo`. Status codes `00xx` are successes, so an empty search result (0002) or a partial
+`CreateMultipleMessage` (0004, per-recipient statuses in `dmMultipleStatus`) does not throw.
+
+## Large messages (VoDZ)
+
+`bigMessages()` streams: attachments are uploaded from a stream, and downloads are written into
+streams you provide, so memory stays flat regardless of message size.
 
 ```php
-$files = [
-    '/path/to/a/file.pdf',
-];
-$message = $simpleApi->createBasicDataMessage('wucb4dd', 'Test', $files);
-$sentMessage = $simpleApi->sendDataMessage($message);
-if ($sentMessage->getDmStatus()->getDmStatusCode() !== "0000") {
-    // Handle errors
-}
+$att = $isds->bigMessages()->uploadAttachment(fopen('big.pdf', 'rb'), 'application/pdf', 'big.pdf');
+$isds->bigMessages()->createBigMessage(
+    new MessageEnvelopeInput(dmAnnotation: 'Velká zpráva', dbIDRecipient: 'abc1234'),
+    [new \MichalCharvat\CzechDataBox\Input\ExtFileInput($att, 'main')],
+);
+$isds->bigMessages()->signedBigMessageDownload('1544602', fopen('message.zfo', 'wb'));
 ```
 
-## Závěrem
+## ZFO
 
-Všechny příklady nejdete ve složce examples. Pro připojení k datové schránce budete potřebovat login a heslo nebo testovací přístup, který lze získat na základě vyplnění [tohoto formuláře](https://www.datoveschranky.info/documents/1744842/1746073/zadost_zrizeni_testovaci_ds.zfo/4b75d5bf-0272-4305-9cef-8ec8f019e9d3).
+```php
+use MichalCharvat\CzechDataBox\Zfo\{Zfo, ZfoKind, ZfoLimits};
 
-Jakmile přístupové údaje budete mít, vytvořte config.ini (z config.ini.dist).
+$bytes = $isds->messageOperations()->signedMessageDownload('1234567')->bytes;
+Zfo::kind($bytes);                        // ReceivedMessage | SentMessage | DeliveryInfo
+$message = Zfo::parse($bytes);            // Dto\Message (≤ ~20 MB, in memory)
+$info = Zfo::parseDeliveryInfo($bytes);   // Dto\DeliveryInfo with its events
+$signer = Zfo::signer($bytes);            // signing time, certificate validity, CN
 
-## Odkazy
+// bounded memory for any size: each attachment goes into the stream you return
+$envelope = Zfo::parseStream(fopen('big.zfo', 'rb'), fn(array $meta) => fopen('/tmp/' . $meta['dmFileDescr'], 'wb'));
+```
 
-- Testovací prostředí datových schránek - https://www.czebox.cz/
-- Ostré prostředí datových schránek - https://www.mojedatovaschranka.cz/
+`Zfo` only **unwraps** the CMS envelope: it does not verify the signature, the certificate chain or
+the time stamp. For an authenticity check ask ISDS: `messageOperations()->authenticateMessage($bytes)`.
+Parsing is hardened — DOCTYPE and entity declarations are rejected, and `ZfoLimits` caps file count,
+file and total size, XML depth, element count and in-memory size. `parseStream()` needs
+`openssl_cms_verify` (the pure-PHP DER fallback works only on in-memory input).
 
-## Contributing
+## Security notes
 
-Budu rád za každý návrh na vylepšení :-)
+- TLS 1.2+, peer and host verification always on, bundled CA file.
+- Passwords and PEM data are `#[\SensitiveParameter]` and hidden from `var_dump`/`print_r` via
+  `__debugInfo()`. On **PHP 8.1** that attribute is ignored, so set `zend.exception_ignore_args=1`
+  (the php.ini-production default) to keep credentials out of exception traces.
+- Message content is never written to disk, except: 0600 temp files while openssl unwraps a CMS
+  document (`Zfo`), and a 0600 client-certificate file only on cURL builds without
+  `CURLOPT_SSLCERT_BLOB`. Both are deleted immediately.
+- `resources/wsdl` is bundled, so no WSDL is fetched at runtime and `LIBXML_NONET` is set where XML
+  is loaded directly.
 
-## @TODO
+## Testing
 
-- Jednoduché hledání na základě jména, příjmení nebo názvu firmy nebo úřadu
+```bash
+composer test      # unit suite, no network
+composer analyse   # PHPStan level 8
+```
+
+The live suite talks to the public test environment and is skipped without credentials:
+
+```bash
+ISDS_TEST_USER=… ISDS_TEST_PASS=… ISDS_TEST_SELF_DBID=… \
+  [ISDS_TEST_RECIPIENT_DBID=…] [ISDS_TEST_CERT=…] [ISDS_CAPTURE=1] \
+  vendor/bin/phpunit --testsuite live
+```
+
+It sends a message, reads lists, downloads signed documents and (with `ISDS_CAPTURE=1`) stores real
+ZFO captures in `tests/fixtures/captured/` (git-ignored). Note it delivers received messages of that box.
+
+## Sources
+
+`docs/sources.md` records the exact documents, versions, endpoint matrix and the one local WSDL patch;
+the WS manuals are in `docs/`. Bundled WSDL/XSD: `resources/wsdl/`.
+
+## License
+
+MIT. Originally based on [dfridrich/CzechDataBox](https://github.com/dfridrich/CzechDataBox).
