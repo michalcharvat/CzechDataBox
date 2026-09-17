@@ -84,6 +84,20 @@ final class Normalize
         return $s === null ? null : self::parseDateTime($s);
     }
 
+    /** xs:date: calendar date at 00:00 UTC, no zone conversion. */
+    public static function date(?object $o, string $prop): ?\DateTimeImmutable
+    {
+        $s = self::string($o, $prop);
+        if ($s === null) {
+            return null;
+        }
+        $d = \DateTimeImmutable::createFromFormat('!Y-m-d', substr($s, 0, 10), new \DateTimeZone('UTC'));
+        if ($d === false) {
+            throw new \UnexpectedValueException('Invalid ISDS date: ' . $s);
+        }
+        return $d;
+    }
+
     public static function parseDateTime(string $s): \DateTimeImmutable
     {
         $hasZone = (bool)preg_match('/(Z|[+-]\d{2}:?\d{2})$/', $s);

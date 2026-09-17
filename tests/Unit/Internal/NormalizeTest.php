@@ -71,4 +71,11 @@ final class NormalizeTest extends TestCase
         $this->expectException(\UnexpectedValueException::class);
         Normalize::dateTime((object)['t' => 'yesterday-ish'], 't');
     }
+
+    public function testDateHasNoZoneShift(): void
+    {
+        $d = Normalize::date((object)['d' => '1989-12-29+01:00'], 'd');
+        self::assertSame('1989-12-29 00:00:00 UTC', $d?->format('Y-m-d H:i:s T'));
+        self::assertNull(Normalize::date((object)[], 'd'));
+    }
 }
