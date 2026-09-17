@@ -29,7 +29,7 @@ final class Normalize
             return [];
         }
         if (is_array($raw)) {
-            return array_values(array_filter($raw, 'is_object'));
+            return array_values(array_filter($raw, static fn(mixed $v): bool => $v instanceof \stdClass));
         }
         if ($raw instanceof \stdClass) {
             return get_object_vars($raw) === [] ? [] : [$raw];

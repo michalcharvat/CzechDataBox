@@ -19,7 +19,7 @@ final class ErrorCodes
         return (bool)preg_match('/^00\d\d$/', $code);
     }
 
-    /** @var array<string, class-string<Exception\IsdsException>> */
+    /** @var array<int, class-string<Exception\IsdsException>> numeric-string keys become int keys in PHP */
     public const MAP = [
         '1211' => Exception\MessageNotFound::class,      // message of another box / wrong direction
         '1219' => Exception\MessageErased::class,        // erased (90 days after delivery / 3 years)

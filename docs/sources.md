@@ -50,3 +50,21 @@ dm_operations.wsdl verze: 3.11
 dm_VoDZ.wsdl verze: 3.11
 dmBaseTypes.xsd verze: 3.11
 ```
+
+## Endpoint matrix (`src/Endpoint/EndpointTable.php`)
+
+WS manual 3.8.1, ch. 1.2.1.1 baseURL per login kind, 1.2.2.1 VoDZ, 1.2.3 archive:
+
+| Login | ws1 services (dz, dx, df, DsManage) | ws2 services (vodz, arch) |
+|---|---|---|
+| name + password | `https://ws1.{d}/DS/{svc}` | `https://ws2.{d}/DS/{svc}` |
+| system certificate | `https://ws1c.{d}/cert/DS/{svc}` | `https://ws2c.{d}/cert/DS/{svc}` |
+| certificate + name + password | `https://ws1c.{d}/certds/DS/{svc}` | `https://ws2c.{d}/certds/DS/{svc}` |
+| hosted records service (box id as Basic user) | `https://ws1c.{d}/hspis/DS/{svc}` | `https://ws2c.{d}/hspis/DS/{svc}` |
+
+`{d}` = `datovka.gov.cz` / `datovka-test.gov.cz`; legacy `mojedatovaschranka.cz` / `czebox.cz` stay valid
+("Stará URL … jsou i nadále použitelná"). The manual shows ws2c only as `…/DS/vodz` "see 1.2.1.1" with the
+`/cert` example, and `ws2c/cert/DS/arch` "atd."; the `/certds` and `/hspis` ws2c cells follow that rule and
+are confirmed only once a live certificate login exercises them. All 16 host names resolve and verify
+against `resources/ca/isds-ca-bundle.pem` (2026-09-17). Not modelled: `www.datovka.gov.cz/apps` (OTP/mobile key),
+`ws1c/hssu` (§14a access interface), `*.datovka.cms2.cz` (KIVS network).
