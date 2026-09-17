@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:GetListOfReceivedMessagesResponse>
+      <p:dmRecords>
+        <p:dmRecord>
+          <p:dmOrdinal>1</p:dmOrdinal>
+          <p:dmID>7800001</p:dmID>
+          <p:dbIDSender>ximacm6</p:dbIDSender>
+          <p:dmSender>Testovací exekutor</p:dmSender>
+          <p:dmSenderAddress>Dlouhá 1, 12300 Praha, CZ</p:dmSenderAddress>
+          <p:dmSenderType>15</p:dmSenderType>
+          <p:dmRecipient>testovací schránka 007</p:dmRecipient>
+          <p:dmRecipientAddress>krátká 8, 12300 Praha, CZ</p:dmRecipientAddress>
+          <p:dmSenderOrgUnit xsi:nil="true"/>
+          <p:dmSenderOrgUnitNum>0</p:dmSenderOrgUnitNum>
+          <p:dbIDRecipient>jyg3h5s</p:dbIDRecipient>
+          <p:dmRecipientOrgUnit xsi:nil="true"/>
+          <p:dmRecipientOrgUnitNum>0</p:dmRecipientOrgUnitNum>
+          <p:dmToHands xsi:nil="true"/>
+          <p:dmAnnotation>zkušební zpráva 1</p:dmAnnotation>
+          <p:dmRecipientRefNumber xsi:nil="true"/>
+          <p:dmSenderRefNumber xsi:nil="true"/>
+          <p:dmRecipientIdent xsi:nil="true"/>
+          <p:dmSenderIdent xsi:nil="true"/>
+          <p:dmLegalTitleLaw xsi:nil="true"/>
+          <p:dmLegalTitleYear xsi:nil="true"/>
+          <p:dmLegalTitleSect xsi:nil="true"/>
+          <p:dmLegalTitlePar xsi:nil="true"/>
+          <p:dmLegalTitlePoint xsi:nil="true"/>
+          <p:dmPersonalDelivery>false</p:dmPersonalDelivery>
+          <p:dmAllowSubstDelivery>true</p:dmAllowSubstDelivery>
+          <p:dmMessageStatus>6</p:dmMessageStatus>
+          <p:dmAttachmentSize>12</p:dmAttachmentSize>
+          <p:dmDeliveryTime>2026-09-01T11:41:10.760+02:00</p:dmDeliveryTime>
+          <p:dmAcceptanceTime>2026-09-01T12:40:11.000+02:00</p:dmAcceptanceTime>
+        </p:dmRecord>
+      </p:dmRecords>
+      <p:dmStatus><p:dmStatusCode>0000</p:dmStatusCode><p:dmStatusMessage>Provedeno úspěšně.</p:dmStatusMessage></p:dmStatus>
+    </p:GetListOfReceivedMessagesResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

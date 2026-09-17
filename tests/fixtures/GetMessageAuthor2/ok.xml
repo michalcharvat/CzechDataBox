@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:GetMessageAuthor2Response>
+      <p:dmMessageAuthor>
+        <p:maItem key="userType" value="PRIMARY_USER"/>
+        <p:maItem key="pnGivenNames" value="Jan Ladislav"/>
+        <p:maItem key="pnLastName" value="Novák"/>
+        <p:maItem key="biDate" value="1989-12-29"/>
+        <p:maItem key="robIdent" value="true"/>
+      </p:dmMessageAuthor>
+      <p:dmStatus><p:dmStatusCode>0000</p:dmStatusCode><p:dmStatusMessage>Provedeno úspěšně.</p:dmStatusMessage></p:dmStatus>
+    </p:GetMessageAuthor2Response>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

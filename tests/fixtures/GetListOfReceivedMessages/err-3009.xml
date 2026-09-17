@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:GetListOfReceivedMessagesResponse>
+      <p:dmStatus><p:dmStatusCode>3009</p:dmStatusCode><p:dmStatusMessage>Právě se zpracovává jiný požadavek pro tento účet datové schránky, zašlete prosím požadavek později.</p:dmStatusMessage></p:dmStatus>
+    </p:GetListOfReceivedMessagesResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

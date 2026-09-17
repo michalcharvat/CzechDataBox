@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:GetMessageStateChangesResponse>
+      <p:dmRecords>
+        <p:dmRecord>
+          <p:dmID>901</p:dmID>
+          <p:dmEventTime>2026-09-01T09:00:00.000+02:00</p:dmEventTime>
+          <p:dmMessageStatus>4</p:dmMessageStatus>
+        </p:dmRecord>
+        <p:dmRecord>
+          <p:dmID>902</p:dmID>
+          <p:dmEventTime>2026-09-02T09:00:00.000+02:00</p:dmEventTime>
+          <p:dmMessageStatus>5</p:dmMessageStatus>
+        </p:dmRecord>
+        <p:dmRecord>
+          <p:dmID>903</p:dmID>
+          <p:dmEventTime>2026-09-03T09:00:00.000+02:00</p:dmEventTime>
+          <p:dmMessageStatus>6</p:dmMessageStatus>
+        </p:dmRecord>
+      </p:dmRecords>
+      <p:dmStatus><p:dmStatusCode>0000</p:dmStatusCode><p:dmStatusMessage>Provedeno úspěšně.</p:dmStatusMessage></p:dmStatus>
+    </p:GetMessageStateChangesResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

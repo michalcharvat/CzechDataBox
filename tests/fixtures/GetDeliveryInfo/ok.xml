@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:GetDeliveryInfoResponse>
+      <p:dmDelivery>
+        <p:dmDm>
+          <p:dmID>1234567</p:dmID>
+          <p:dbIDSender>ximacm6</p:dbIDSender>
+          <p:dmSender>Testovací exekutor</p:dmSender>
+          <p:dmSenderAddress>Dlouhá 1, 12300 Praha, CZ</p:dmSenderAddress>
+          <p:dmSenderType>15</p:dmSenderType>
+          <p:dmRecipient>testovací schránka 007</p:dmRecipient>
+          <p:dmRecipientAddress>krátká 8, 12300 Praha, CZ</p:dmRecipientAddress>
+          <p:dmSenderOrgUnit xsi:nil="true"/>
+          <p:dmSenderOrgUnitNum xsi:nil="true"/>
+          <p:dbIDRecipient>jyg3h5s</p:dbIDRecipient>
+          <p:dmRecipientOrgUnit xsi:nil="true"/>
+          <p:dmRecipientOrgUnitNum xsi:nil="true"/>
+          <p:dmToHands xsi:nil="true"/>
+          <p:dmAnnotation>zkušební zpráva</p:dmAnnotation>
+          <p:dmRecipientRefNumber xsi:nil="true"/>
+          <p:dmSenderRefNumber xsi:nil="true"/>
+          <p:dmRecipientIdent xsi:nil="true"/>
+          <p:dmSenderIdent xsi:nil="true"/>
+          <p:dmLegalTitleLaw xsi:nil="true"/>
+          <p:dmLegalTitleYear xsi:nil="true"/>
+          <p:dmLegalTitleSect xsi:nil="true"/>
+          <p:dmLegalTitlePar xsi:nil="true"/>
+          <p:dmLegalTitlePoint xsi:nil="true"/>
+          <p:dmPersonalDelivery>false</p:dmPersonalDelivery>
+          <p:dmAllowSubstDelivery>true</p:dmAllowSubstDelivery>
+        </p:dmDm>
+        <p:dmHash algorithm="SHA-256">AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=</p:dmHash>
+        <p:dmQTimestamp>dGltZXN0YW1w</p:dmQTimestamp>
+        <p:dmDeliveryTime>2026-09-01T10:00:00.123+02:00</p:dmDeliveryTime>
+        <p:dmAcceptanceTime>2026-09-03T08:30:00.000+02:00</p:dmAcceptanceTime>
+        <p:dmMessageStatus>6</p:dmMessageStatus>
+        <p:dmEvents>
+          <p:dmEvent>
+            <p:dmEventTime>2026-09-01T10:00:00.123+02:00</p:dmEventTime>
+            <p:dmEventDescr>EV0: Zpráva byla dodána do schránky.</p:dmEventDescr>
+          </p:dmEvent>
+          <p:dmEvent>
+            <p:dmEventTime>2026-09-03T08:30:00.000+02:00</p:dmEventTime>
+            <p:dmEventDescr>EV5: Zpráva byla doručena přihlášením oprávněné osoby.</p:dmEventDescr>
+          </p:dmEvent>
+        </p:dmEvents>
+      </p:dmDelivery>
+      <p:dmStatus><p:dmStatusCode>0000</p:dmStatusCode><p:dmStatusMessage>Provedeno úspěšně.</p:dmStatusMessage></p:dmStatus>
+    </p:GetDeliveryInfoResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
