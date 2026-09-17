@@ -16,6 +16,11 @@ final class Fixture
         return $xml;
     }
 
+    public static function loadVodz(string $case): string
+    {
+        return self::load('vodz', $case);
+    }
+
     /** Wraps a response body element in a SOAP 1.1 envelope. */
     public static function envelope(string $bodyXml): string
     {

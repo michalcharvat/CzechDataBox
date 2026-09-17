@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <q:UploadAttachmentResponse xmlns:q="http://isds.czechpoint.cz/v20">
+      <q:dmAttID>54520</q:dmAttID>
+      <q:dmAttHash1 AttHashAlg="SHA-256">e226488b85c22f80bc0bb91580e09292c83ba70222201ce6a1473c5a2dfc2ae3</q:dmAttHash1>
+      <q:dmAttHash2 AttHashAlg="SHA3-256">5f2b3a1e0c0d4e8f9a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f</q:dmAttHash2>
+      <q:dmStatus><q:dmStatusCode>0000</q:dmStatusCode><q:dmStatusMessage>Provedeno úspěšně.</q:dmStatusMessage></q:dmStatus>
+    </q:UploadAttachmentResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

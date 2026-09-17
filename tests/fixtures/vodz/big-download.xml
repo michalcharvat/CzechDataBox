@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <q:BigMessageDownloadResponse xmlns:q="http://isds.czechpoint.cz/v20">
+      <q:dmReturnedMessage dmVODZ="true" attsNum="2">
+        <q:dmDm>
+          <q:dmID>1544602</q:dmID>
+          <q:dbIDSender>ximacm6</q:dbIDSender>
+          <q:dmSender>Testovací exekutor</q:dmSender>
+          <q:dmAnnotation>Velká zpráva</q:dmAnnotation>
+          <q:dmFiles>
+            <q:dmFile dmMimeType="application/pdf" dmFileMetaType="main" dmFileDescr="big.pdf"><q:dmEncodedContent><xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include" href="cid:fixture@cid"/></q:dmEncodedContent></q:dmFile>
+            <q:dmFile dmMimeType="text/plain" dmFileMetaType="enclosure" dmFileDescr="small.txt"><q:dmEncodedContent>YWhvag==</q:dmEncodedContent></q:dmFile>
+          </q:dmFiles>
+        </q:dmDm>
+        <q:dmHash algorithm="SHA-256">AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=</q:dmHash>
+        <q:dmQTimestamp xsi:nil="true"/>
+        <q:dmDeliveryTime>2026-09-01T10:00:00.000+02:00</q:dmDeliveryTime>
+        <q:dmAcceptanceTime xsi:nil="true"/>
+        <q:dmMessageStatus>4</q:dmMessageStatus>
+        <q:dmAttachmentSize>52000</q:dmAttachmentSize>
+      </q:dmReturnedMessage>
+      <q:dmStatus><q:dmStatusCode>0000</q:dmStatusCode><q:dmStatusMessage>Provedeno úspěšně.</q:dmStatusMessage></q:dmStatus>
+    </q:BigMessageDownloadResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

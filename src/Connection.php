@@ -23,12 +23,12 @@ final class Connection
     /** @var (\Closure(Service, string): TransportInterface)|null */
     private readonly ?\Closure $transportFactory;
 
-    /** @var (\Closure(string): VodzTransport)|null */
+    /** @var (\Closure(Service, string): VodzTransport)|null */
     private readonly ?\Closure $vodzTransportFactory;
 
     /**
      * @param (callable(Service, string): TransportInterface)|null $transportFactory for tests (SOAP 1.1 endpoints)
-     * @param (callable(string): VodzTransport)|null $vodzTransportFactory for tests (VoDZ endpoint, receives the URL)
+     * @param (callable(Service, string): VodzTransport)|null $vodzTransportFactory for tests (ws2 SOAP 1.2 + MTOM endpoints: vodz, arch)
      */
     public function __construct(
         public readonly Environment $environment,
@@ -64,7 +64,8 @@ final class Connection
     }
     public function archive(): Svc\Archive
     {
-        return $this->service(Service::Archive, Svc\Archive::class);
+        /** @var Svc\Archive */
+        return $this->services['arch'] ??= new Svc\Archive($this->vodzTransport(Service::Archive));
     }
 
     /** OTP accounts only: build this Connection with password . otpCode as the Basic-auth password. */
@@ -76,7 +77,7 @@ final class Connection
     public function bigMessages(): Svc\BigMessages
     {
         /** @var Svc\BigMessages */
-        return $this->services['vodz'] ??= new Svc\BigMessages($this->vodzTransport());
+        return $this->services['vodz'] ??= new Svc\BigMessages($this->vodzTransport(Service::BigMessages));
     }
 
     /**
@@ -102,11 +103,11 @@ final class Connection
         return $this->transports[$service->name];
     }
 
-    private function vodzTransport(): VodzTransport
+    private function vodzTransport(Service $service): VodzTransport
     {
-        $url = EndpointTable::url($this->environment, $this->legacyDomain, $this->credentials->kind(), Service::BigMessages);
+        $url = EndpointTable::url($this->environment, $this->legacyDomain, $this->credentials->kind(), $service);
         return $this->vodzTransportFactory !== null
-            ? ($this->vodzTransportFactory)($url)
+            ? ($this->vodzTransportFactory)($service, $url)
             : new VodzTransport($url, $this->credentials, $this->options);
     }
 
