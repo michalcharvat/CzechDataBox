@@ -47,6 +47,16 @@ final class SearchTest extends TestCase
         self::assertStringContainsString('<ns1:ciFromDate>2026-09-01</ns1:ciFromDate>', $t->lastRequestXml());
     }
 
+    public function testGetConstantsAlwaysSendsTheRequiredConstDate(): void
+    {
+        $t = FakeTransport::for(Service::Search)->reply('GetConstants', 'ok')->reply('GetConstants', 'ok');
+        $svc = new Search($t);
+        $svc->getConstants();
+        self::assertStringContainsString('<ns1:constDate xsi:nil="true"/>', $t->lastRequestXml(), 'constDate is required (nillable)');
+        $svc->getConstants(new \DateTimeImmutable('2026-09-17'));
+        self::assertStringContainsString('<ns1:constDate>2026-09-17</ns1:constDate>', $t->lastRequestXml());
+    }
+
     public function testFindDataBox2MapsOwnersAndSendsTemplate(): void
     {
         $t = FakeTransport::for(Service::Search)->reply('FindDataBox2', 'many');

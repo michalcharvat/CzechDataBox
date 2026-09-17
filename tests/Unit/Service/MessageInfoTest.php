@@ -42,7 +42,8 @@ final class MessageInfoTest extends TestCase
         self::assertStringContainsString('2026-09-01T00:00:00.000Z', $req);
         self::assertStringContainsString('>1000<', $req);
         self::assertStringContainsString('>-1<', $req, 'status filter defaults to all');
-        self::assertStringNotContainsString('dmOffset>0<', $req, 'offset is not sent unless given');
+        // ext-soap nil-fills the required-but-unset elements, which ISDS reads as "no filter"
+        self::assertStringContainsString('<ns1:dmOffset xsi:nil="true"/>', $req);
     }
 
     public function testDeliveryInfoWithEvents(): void

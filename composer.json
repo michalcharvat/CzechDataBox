@@ -25,7 +25,7 @@
   "scripts": {
     "test": "phpunit --testsuite unit",
     "test-live": "phpunit --testsuite live",
-    "analyse": "phpstan analyse"
+    "analyse": "@php -d memory_limit=1G vendor/bin/phpstan analyse"
   },
   "config": {"sort-packages": true}
 }

@@ -54,6 +54,26 @@ final class AccessTest extends TestCase
         }
     }
 
+    /** A SOAP fault is chained too, and SoapClient::__soapCall's own frame must not reach the chain. */
+    #[RequiresPhp('>= 8.2')]
+    public function testChangePasswordDoesNotLeakThroughAChainedSoapFault(): void
+    {
+        $t = FakeTransport::for(Service::Access)->replyRaw('ChangeISDSPassword', FakeTransport::soapFault('Server', 'kaput'));
+        try {
+            (new Access($t))->changeIsdsPassword('Old-Secret-1', 'New-Secret-2');
+            self::fail('expected exception');
+        } catch (IsdsException $e) {
+            self::assertInstanceOf(\SoapFault::class, $e->getPrevious());
+            $dump = '';
+            for ($x = $e; $x !== null; $x = $x->getPrevious()) {
+                $dump .= $x->getMessage() . print_r($x->getTrace(), true);
+            }
+            self::assertStringContainsString('kaput', $e->getMessage());
+            self::assertStringNotContainsString('Old-Secret-1', $dump);
+            self::assertStringNotContainsString('New-Secret-2', $dump);
+        }
+    }
+
     public function testPasswordChangeServiceSendsSmsCode(): void
     {
         $t = FakeTransport::for(Service::ChangePassword)->reply('SendSMSCode', 'ok');

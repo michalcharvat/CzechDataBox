@@ -58,6 +58,13 @@ final class ZfoTest extends TestCase
         Zfo::parseDeliveryInfo(ZfoFactory::sign(ZfoFactory::receivedMessage('1', [['a', 'text/plain', 'x']])));
     }
 
+    public function testDmHashIsDecodedLikeTheSoapPath(): void
+    {
+        $m = Zfo::parse(ZfoFactory::sign(ZfoFactory::receivedMessage('1', [['a', 'text/plain', 'x']])));
+        self::assertSame('hash', $m->envelope->dmHash, 'dmHash is xs:base64Binary: DTOs carry decoded bytes');
+        self::assertSame('SHA-256', $m->envelope->dmHashAlgorithm);
+    }
+
     public function testKindSentAndDelivery(): void
     {
         self::assertSame(ZfoKind::SentMessage, Zfo::kind(ZfoFactory::sign(ZfoFactory::receivedMessage('1', [['a', 'text/plain', 'x']], ZfoFactory::NS_SENT))));
@@ -70,6 +77,9 @@ final class ZfoTest extends TestCase
 
     public function testParseStreamWritesFilesToSinks(): void
     {
+        if (!function_exists('openssl_cms_verify')) {
+            self::markTestSkipped('parseStream needs openssl CMS support (no DER fallback for streams)');
+        }
         $big = random_bytes(3_000_000);
         $zfo = ZfoFactory::sign(ZfoFactory::receivedMessage('9', [['big.bin', 'application/octet-stream', $big]]));
         $in = fopen('php://memory', 'w+b');
@@ -133,12 +143,41 @@ final class ZfoTest extends TestCase
         self::assertSame($inner, (new CmsUnwrapper())->content($zfo));
     }
 
-    public function testTempFilesAreRemoved(): void
+    public function testTempFilesAreRemovedOnEveryPath(): void
     {
         $dir = sys_get_temp_dir() . '/zfo-test-' . bin2hex(random_bytes(4));
         mkdir($dir, 0700);
-        (new CmsUnwrapper(tempDir: $dir))->content(ZfoFactory::sign('<x/>'));
-        self::assertSame([], array_values(array_diff(scandir($dir) ?: [], ['.', '..'])));
+        $left = static fn(): array => array_values(array_diff(scandir($dir) ?: [], ['.', '..']));
+        $zfo = ZfoFactory::sign(ZfoFactory::receivedMessage('1', [['a', 'text/plain', 'x']]));
+
+        (new CmsUnwrapper(tempDir: $dir))->content($zfo);
+        self::assertSame([], $left(), 'content()');
+
+        (new CmsUnwrapper(tempDir: $dir))->signer($zfo);
+        self::assertSame([], $left(), 'signer()');
+
+        $in = fopen('php://memory', 'w+b');
+        fwrite($in, $zfo);
+        rewind($in);
+        Zfo::parseStream($in, static fn() => fopen('php://memory', 'w+b'), new ZfoLimits(), $dir);
+        self::assertSame([], $left(), 'parseStream()');
+
+        try {
+            (new CmsUnwrapper(tempDir: $dir))->content('not a cms structure');
+        } catch (InvalidZfo) {
+        }
+        self::assertSame([], $left(), 'failed unwrap');
+
+        $tiny = fopen('php://memory', 'w+b');
+        fwrite($tiny, $zfo);
+        rewind($tiny);
+        try {
+            Zfo::parseStream($tiny, static fn() => fopen('php://memory', 'w+b'), new ZfoLimits(maxZfoBytes: 10), $dir);
+            self::fail('size limit not enforced');
+        } catch (InvalidZfo) {
+        }
+        self::assertSame([], $left(), 'ZFO over maxZfoBytes');
+
         rmdir($dir);
     }
 }

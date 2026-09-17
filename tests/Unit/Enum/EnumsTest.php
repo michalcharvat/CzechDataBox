@@ -22,6 +22,14 @@ final class EnumsTest extends TestCase
         self::assertFalse(MessageStatus::Submitted->isDelivered());
     }
 
+    public function testStatusFilterBits(): void
+    {
+        // WS manual worked examples: delivered = states 5+6 → 96, vault = state 10 → 1024
+        self::assertSame(96, MessageStatus::TenDaysElapsed->filterBit() | MessageStatus::Delivered->filterBit());
+        self::assertSame(1024, MessageStatus::InVault->filterBit());
+        self::assertSame(2, MessageStatus::Submitted->filterBit());
+    }
+
     public function testPrivilegeBits(): void
     {
         self::assertSame(159, Privilege::mask(

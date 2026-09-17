@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MichalCharvat\CzechDataBox\Dto;
 
+use MichalCharvat\CzechDataBox\Exception\MalformedResponse;
 use MichalCharvat\CzechDataBox\Internal\Normalize as N;
 
 /** UploadAttachmentResponse: reference for CreateBigMessage/dmExtFile. ISDS keeps unused uploads ~2 hours. */
@@ -21,7 +22,7 @@ final class UploadedAttachment
 
     public static function fromRaw(\stdClass $r): self
     {
-        $missing = static fn(string $what) => new \UnexpectedValueException('UploadAttachmentResponse lacks ' . $what);
+        $missing = static fn(string $what) => new MalformedResponse(null, 'UploadAttachmentResponse lacks ' . $what, 'UploadAttachment');
         $h1 = N::child($r, 'dmAttHash1') ?? throw $missing('dmAttHash1');
         $h2 = N::child($r, 'dmAttHash2') ?? throw $missing('dmAttHash2');
         return new self(

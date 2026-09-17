@@ -73,10 +73,20 @@ final class Zfo
         $out = self::tmp($tempDir);
         try {
             $fh = fopen($in, 'wb');
-            if ($fh === false || stream_copy_to_stream($zfo, $fh) === false) {
+            if ($fh === false) {
                 throw new InvalidZfo(null, 'Cannot buffer ZFO', 'Zfo');
             }
-            fclose($fh);
+            try {
+                $copied = stream_copy_to_stream($zfo, $fh, $limits->maxZfoBytes + 1);
+                if ($copied === false) {
+                    throw new InvalidZfo(null, 'Cannot buffer ZFO', 'Zfo');
+                }
+                if ($copied > $limits->maxZfoBytes) {
+                    throw new InvalidZfo(null, 'ZFO exceeds ' . $limits->maxZfoBytes . ' bytes', 'Zfo');
+                }
+            } finally {
+                fclose($fh);
+            }
             $unwrapper->contentToFile($in, $out);
             $parser = new ZfoXmlParser($limits, \Closure::fromCallable($fileSink));
             $rh = fopen($out, 'rb');
@@ -118,12 +128,22 @@ final class Zfo
         $f = $parser->fields();
         $raw = (object)$f;
         if (isset($f['dmHash'])) {
-            $raw->dmHash = (object)['_' => $f['dmHash'], 'algorithm' => $f['dmHashAlgorithm'] ?? null];
+            // xs:base64Binary: ext-soap hands DTOs the decoded bytes, so decode here too
+            $raw->dmHash = (object)['_' => self::binary($f['dmHash'], 'dmHash'), 'algorithm' => $f['dmHashAlgorithm'] ?? null];
         }
         if (isset($f['dmQTimestamp'])) {
-            $raw->dmQTimestamp = base64_decode($f['dmQTimestamp'], true) ?: null;
+            $raw->dmQTimestamp = self::binary($f['dmQTimestamp'], 'dmQTimestamp');
         }
         return MessageEnvelope::fromRaw($raw);
+    }
+
+    private static function binary(string $base64, string $element): string
+    {
+        $bytes = base64_decode($base64, true);
+        if ($bytes === false) {
+            throw new InvalidZfo(null, 'Invalid base64 in ' . $element, 'Zfo');
+        }
+        return $bytes;
     }
 
     /** @param list<ZfoKind> $allowed */

@@ -65,6 +65,17 @@ final class BigMessagesTest extends TestCase
         (new BigMessages($t))->signedBigMessageDownload('123', fopen('php://memory', 'w+b'));
     }
 
+    public function testSignedSentBigMessageDownload(): void
+    {
+        $t = (new FakeVodzTransport())->reply('SignedSentBigMessageDownload', 'signed-sent-ok', binary: 'SENT-ZFO');
+        $sink = fopen('php://memory', 'w+b');
+        (new BigMessages($t))->signedSentBigMessageDownload('123', $sink);
+        self::assertSame(['SignedSentBigMessageDownload'], $t->operations);
+        self::assertStringContainsString('<p:SignedSentBigMessageDownload xmlns:p="http://isds.czechpoint.cz/v20"><p:dmID>123</p:dmID>', $t->lastBodyXml);
+        rewind($sink);
+        self::assertSame('SENT-ZFO', stream_get_contents($sink));
+    }
+
     public function testStatusCodeStillMapped(): void
     {
         $t = (new FakeVodzTransport())->reply('BigMessageDownload', 'err-1281');

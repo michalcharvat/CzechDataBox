@@ -25,7 +25,11 @@ final class SoapTransport implements TransportInterface
             if ($transport !== null) {
                 throw $transport;
             }
-            throw new IsdsException($fault->faultcode ?? null, 'SOAP fault: ' . $fault->getMessage(), $operation, $fault);
+            // The original fault was thrown inside SoapClient::__soapCall, whose stack frame holds the
+            // request parameters (passwords) and cannot be marked #[\SensitiveParameter]. Chain an
+            // equivalent fault created here instead, so the trace only has redacted frames.
+            $safe = new \SoapFault((string)($fault->faultcode ?? 'Server'), $fault->getMessage());
+            throw new IsdsException($fault->faultcode ?? null, 'SOAP fault: ' . $fault->getMessage(), $operation, $safe);
         }
         if (!$result instanceof \stdClass) {
             throw new ServiceUnavailable(null, 'Empty SOAP response', $operation);

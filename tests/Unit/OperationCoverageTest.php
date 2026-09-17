@@ -31,7 +31,7 @@ final class OperationCoverageTest extends TestCase
             $functions = (new \SoapClient($wsdl, ['soap_version' => $version]))->__getFunctions() ?? [];
             $class = self::SERVICE_CLASSES[$service->name];
             foreach ($functions as $signature) {
-                preg_match('/^\S+ ([A-Za-z0-9_-]+)\(/', $signature, $m);
+                self::assertSame(1, preg_match('/^\S+ ([A-Za-z0-9_-]+)\(/', $signature, $m), $signature);
                 $total++;
                 $method = lcfirst(str_replace(['-', '_'], '', $m[1]));
                 if (!method_exists($class, $method)) {

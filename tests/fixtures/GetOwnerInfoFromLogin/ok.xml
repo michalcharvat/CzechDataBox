@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:GetOwnerInfoFromLoginResponse>
+      <p:dbOwnerInfo>
+        <p:dbID>abc1234</p:dbID>
+        <p:dbType>PO</p:dbType>
+        <p:ic>12345678</p:ic>
+        <p:pnFirstName xsi:nil="true"/>
+        <p:pnMiddleName xsi:nil="true"/>
+        <p:pnLastName xsi:nil="true"/>
+        <p:pnLastNameAtBirth xsi:nil="true"/>
+        <p:firmName>ACME s.r.o.</p:firmName>
+      </p:dbOwnerInfo>
+      <p:dbStatus><p:dbStatusCode>0000</p:dbStatusCode><p:dbStatusMessage>Provedeno úspěšně.</p:dbStatusMessage></p:dbStatus>
+    </p:GetOwnerInfoFromLoginResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

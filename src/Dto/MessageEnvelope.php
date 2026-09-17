@@ -24,11 +24,11 @@ final class MessageEnvelope
     public static function fromRaw(\stdClass $outer): self
     {
         $dm = N::child($outer, 'dmDm') ?? $outer;
-        $merged = (object)array_merge(get_object_vars($dm), array_filter(
-            get_object_vars($outer),
-            static fn($k) => $k !== 'dmDm' && $k !== 'dmFiles',
+        $merged = (object)array_filter(
+            array_merge(get_object_vars($dm), get_object_vars($outer)),
+            static fn($k) => $k !== 'dmDm' && $k !== 'dmFiles',   // dmFiles lives inside dmDm
             ARRAY_FILTER_USE_KEY,
-        ));
+        );
         $hash = $outer->dmHash ?? null;
         return new self(
             MessageRecord::fromRaw($merged),

@@ -6,6 +6,8 @@ namespace MichalCharvat\CzechDataBox\Tests\Unit\Transport\Vodz;
 
 use MichalCharvat\CzechDataBox\Credentials\PasswordCredentials;
 use MichalCharvat\CzechDataBox\Exception\IsdsException;
+use MichalCharvat\CzechDataBox\Exception\ServiceUnavailable;
+use MichalCharvat\CzechDataBox\Tests\Support\FailingStream;
 use MichalCharvat\CzechDataBox\Transport\TransportOptions;
 use MichalCharvat\CzechDataBox\Transport\Vodz\VodzTransport;
 use PHPUnit\Framework\TestCase;
@@ -13,36 +15,18 @@ use PHPUnit\Framework\TestCase;
 /** Real cURL round trip against a local `php -S` fake of the ws2 endpoint (tests/Support/vodz-server.php). */
 final class VodzTransportHttpTest extends TestCase
 {
-    /** @var resource|null */
-    private static $server = null;
+    private static LocalVodzServer $server;
     private static string $base = '';
 
     public static function setUpBeforeClass(): void
     {
-        $probe = stream_socket_server('tcp://127.0.0.1:0');
-        self::assertIsResource($probe);
-        $port = (int)substr((string)strrchr((string)stream_socket_get_name($probe, false), ':'), 1);
-        fclose($probe);
-        $router = dirname(__DIR__, 3) . '/Support/vodz-server.php';
-        $cmd = [PHP_BINARY, '-n', '-S', '127.0.0.1:' . $port, $router];
-        self::$server = proc_open($cmd, [1 => ['file', '/dev/null', 'w'], 2 => ['file', '/dev/null', 'w']], $pipes);
-        self::$base = 'http://127.0.0.1:' . $port;
-        for ($i = 0; $i < 100; $i++) {
-            if ($c = @fsockopen('127.0.0.1', $port)) {
-                fclose($c);
-                return;
-            }
-            usleep(50_000);
-        }
-        self::fail('php -S did not start');
+        self::$server = LocalVodzServer::start();
+        self::$base = self::$server->url('');
     }
 
     public static function tearDownAfterClass(): void
     {
-        if (is_resource(self::$server)) {
-            proc_terminate(self::$server);
-            proc_close(self::$server);
-        }
+        self::$server->stop();
     }
 
     public function testStreamsUploadWithContentLengthAndParsesMtomResponse(): void
@@ -53,7 +37,7 @@ final class VodzTransportHttpTest extends TestCase
         $out = fopen('php://memory', 'w+b');
 
         [$doc, $cids] = (new VodzTransport(self::$base . '/DS/vodz', new PasswordCredentials('user1', 'pw'), new TransportOptions()))
-            ->call('UploadAttachment', '<v20:Echo xmlns:v20="http://isds.czechpoint.cz/v20">{{cid0}}</v20:Echo>', [[$in, 'application/pdf']], static fn() => $out);
+            ->call('BigMessageDownload', '<v20:Echo xmlns:v20="http://isds.czechpoint.cz/v20">{{cid0}}</v20:Echo>', [[$in, 'application/pdf']], static fn() => $out);
 
         $info = json_decode((string)$doc->getElementsByTagNameNS('http://isds.czechpoint.cz/v20', 'info')->item(0)?->textContent, true);
         self::assertIsArray($info);
@@ -61,11 +45,34 @@ final class VodzTransportHttpTest extends TestCase
         self::assertNull($info['transferEncoding'], 'no chunked upload');
         self::assertStringContainsString('multipart/related', (string)$info['accept']);
         self::assertStringStartsWith('multipart/related; type="application/xop+xml"', (string)$info['contentType']);
-        self::assertSame('UploadAttachment', $info['rootAction']);
+        self::assertSame('BigMessageDownload', $info['rootAction']);
         self::assertSame('user1', $info['auth']);
         self::assertSame(['1'], $cids);
         rewind($out);
         self::assertSame($payload, stream_get_contents($out));
+    }
+
+    /**
+     * A caller stream that dies mid-upload must surface its own error and not wait out the VoDZ timeout.
+     * `php -S` answers a short body immediately, so this pins the error reporting and the absence of a
+     * local stall; the XFERINFOFUNCTION abort matters against a server that waits for Content-Length and
+     * can only be confirmed live.
+     */
+    public function testBrokenUploadStreamAbortsImmediately(): void
+    {
+        FailingStream::register();
+        $in = fopen('failing://x', 'rb');
+        self::assertIsResource($in);
+
+        $started = microtime(true);
+        try {
+            (new VodzTransport(self::$base . '/DS/vodz', new PasswordCredentials('u', 'p'), new TransportOptions(vodzTimeout: 120)))
+                ->call('BigMessageDownload', '<v20:Echo xmlns:v20="http://isds.czechpoint.cz/v20">{{cid0}}</v20:Echo>', [[$in, 'application/pdf']], static fn() => fopen('php://memory', 'w+b'));
+            self::fail('expected the upload to fail');
+        } catch (ServiceUnavailable $e) {
+            self::assertStringContainsString('Cannot read MTOM attachment stream', $e->getMessage());
+        }
+        self::assertLessThan(20.0, microtime(true) - $started, 'must not hang until the timeout');
     }
 
     public function testSoap12FaultOnHttp599BecomesIsdsException(): void
@@ -73,6 +80,6 @@ final class VodzTransportHttpTest extends TestCase
         $this->expectException(IsdsException::class);
         $this->expectExceptionMessage('should be application/xop+xml');
         (new VodzTransport(self::$base . '/DS/fault', new PasswordCredentials('u', 'p'), new TransportOptions()))
-            ->call('UploadAttachment', '<x/>', [], static fn() => fopen('php://memory', 'w+b'));
+            ->call('BigMessageDownload', '<x/>', [], static fn() => fopen('php://memory', 'w+b'));
     }
 }

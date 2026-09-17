@@ -29,7 +29,7 @@ final class CertificateFile
     public function __destruct()
     {
         if (is_file($this->path)) {
-            unlink($this->path);
+            @unlink($this->path);
         }
     }
 }

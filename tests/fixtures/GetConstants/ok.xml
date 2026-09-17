@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20">
+  <SOAP-ENV:Body>
+    <p:GetConstantsResponse>
+      <p:constRecords>
+        <p:constRecord>
+          <p:cName>MAX_MSG_SIZE</p:cName>
+          <p:cValue>20971520</p:cValue>
+          <p:cFrom>2026-01-01</p:cFrom>
+          <p:cTo>2099-12-31</p:cTo>
+        </p:constRecord>
+      </p:constRecords>
+      <p:dbStatus><p:dbStatusCode>0000</p:dbStatusCode><p:dbStatusMessage>Provedeno úspěšně.</p:dbStatusMessage></p:dbStatus>
+    </p:GetConstantsResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

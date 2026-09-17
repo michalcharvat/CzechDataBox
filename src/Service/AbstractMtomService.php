@@ -90,7 +90,11 @@ abstract class AbstractMtomService
     protected static function memoryStream(string $bytes)
     {
         $s = fopen('php://memory', 'w+b');
-        if ($s === false || fwrite($s, $bytes) !== strlen($bytes) || !rewind($s)) {
+        if ($s === false) {
+            throw new \RuntimeException('Cannot buffer document');
+        }
+        if (fwrite($s, $bytes) !== strlen($bytes) || !rewind($s)) {
+            fclose($s);
             throw new \RuntimeException('Cannot buffer document');
         }
         return $s;

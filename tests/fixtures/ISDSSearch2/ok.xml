@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:ISDSSearch2Response>
+      <p:totalCount>1</p:totalCount>
+      <p:currentCount>1</p:currentCount>
+      <p:position>0</p:position>
+      <p:lastPage>true</p:lastPage>
+      <p:dbResults>
+        <p:dbResult>
+          <p:dbID>abc1234</p:dbID>
+          <p:dbType>OVM</p:dbType>
+          <p:dbName>Úřad</p:dbName>
+          <p:dbAddress>Praha</p:dbAddress>
+          <p:dbBiDate xsi:nil="true"/>
+          <p:dbICO xsi:nil="true"/>
+          <p:dbIdOVM xsi:nil="true"/>
+          <p:dbSendOptions>ALL</p:dbSendOptions>
+        </p:dbResult>
+      </p:dbResults>
+      <p:dbStatus><p:dbStatusCode>0000</p:dbStatusCode><p:dbStatusMessage>Provedeno úspěšně.</p:dbStatusMessage></p:dbStatus>
+    </p:ISDSSearch2Response>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

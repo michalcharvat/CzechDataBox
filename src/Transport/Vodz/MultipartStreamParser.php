@@ -29,6 +29,7 @@ final class MultipartStreamParser implements BodySink
     private $sink = null;
     /** @var list<string> */
     private array $binaryIds = [];
+    private int $partIndex = 0;
     /** @var \Closure(string): resource */
     private \Closure $sinkFactory;
 
@@ -141,7 +142,10 @@ final class MultipartStreamParser implements BodySink
     private function openPart(string $headers): void
     {
         $cid = preg_match('/^Content-ID:\s*<?([^>\r\n]+)>?/mi', $headers, $m) ? trim($m[1]) : '';
-        $this->inRoot = $this->root === '' && ($this->startCid === '' || $cid === $this->startCid);
+        // MTOM puts the root first; falling back to it keeps a server whose `start` parameter is quoted
+        // or escaped differently from writing the SOAP XML into a caller's binary sink.
+        $isFirstPart = $this->partIndex++ === 0;
+        $this->inRoot = $this->root === '' && ($this->startCid === '' || $cid === $this->startCid || $isFirstPart);
         if (!$this->inRoot) {
             $this->binaryIds[] = $cid;
             $this->sink = ($this->sinkFactory)($cid);

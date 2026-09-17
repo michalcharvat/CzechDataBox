@@ -47,6 +47,7 @@ class VodzTransport
             . '<soap:Body>' . $bodyXml . '</soap:Body></soap:Envelope>';
         $request = $writer->build($envelope, $operation);
 
+        $maxResponseBytes = $this->options->maxResponseBytes;
         $responseType = '';
         /** @var BodySink|null $sink */
         $sink = null;
@@ -66,6 +67,10 @@ class VodzTransport
                     return '';
                 }
             },
+            // PHP has no CURL_READFUNC_ABORT: '' only means EOF, which would leave cURL waiting out the
+            // timeout for the body length it already promised. A non-zero progress callback aborts instead.
+            CURLOPT_NOPROGRESS => false,
+            CURLOPT_XFERINFOFUNCTION => static fn(): int => $callbackError === null ? 0 : 1,
             CURLOPT_HTTPHEADER => [
                 'Content-Type: ' . $writer->contentType(),
                 'MIME-Version: 1.0',
@@ -78,11 +83,11 @@ class VodzTransport
                 }
                 return strlen($line);
             },
-            CURLOPT_WRITEFUNCTION => static function ($ch, string $data) use (&$sink, &$responseType, &$callbackError, $sinkFactory): int {
+            CURLOPT_WRITEFUNCTION => static function ($ch, string $data) use (&$sink, &$responseType, &$callbackError, $sinkFactory, $maxResponseBytes): int {
                 try {
                     $sink ??= str_starts_with(strtolower($responseType), 'multipart/')
-                        ? new MultipartStreamParser($responseType, $sinkFactory)
-                        : new PlainBodyCollector();
+                        ? new MultipartStreamParser($responseType, $sinkFactory, $maxResponseBytes)
+                        : new PlainBodyCollector($maxResponseBytes);
                     $sink->write($data);
                     return strlen($data);
                 } catch (\Throwable $e) {
@@ -90,7 +95,7 @@ class VodzTransport
                     return 0; // aborts the transfer
                 }
             },
-            CURLOPT_TIMEOUT => max($this->options->timeout, 1800),
+            CURLOPT_TIMEOUT => $this->options->vodzTimeout,
         ];
         curl_setopt_array($ch, $opts + CurlAuthOptions::tls($this->options)
             + CurlAuthOptions::for($this->credentials, $this->options, $this->certFile));

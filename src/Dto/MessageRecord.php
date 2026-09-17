@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MichalCharvat\CzechDataBox\Dto;
 
 use MichalCharvat\CzechDataBox\Enum\MessageStatus;
+use MichalCharvat\CzechDataBox\Exception\MalformedResponse;
 use MichalCharvat\CzechDataBox\Internal\Normalize as N;
 
 final class MessageRecord
@@ -53,7 +54,7 @@ final class MessageRecord
     public static function fromRaw(\stdClass $r): self
     {
         return new self(
-            (string)N::string($r, 'dmID'),
+            N::string($r, 'dmID') ?? throw new MalformedResponse(null, 'record without dmID', 'response'),
             N::string($r, 'dbIDSender'), N::string($r, 'dmSender'), N::string($r, 'dmSenderAddress'),
             N::int($r, 'dmSenderType'), N::string($r, 'dmRecipient'), N::string($r, 'dmRecipientAddress'),
             N::bool($r, 'dmAmbiguousRecipient'), N::string($r, 'dmSenderOrgUnit'), N::int($r, 'dmSenderOrgUnitNum'),

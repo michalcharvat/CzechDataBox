@@ -75,7 +75,9 @@ $isds = new Connection(Environment::Production, new SystemCertificateCredentials
 
 The endpoint URL follows from environment + login kind (`Endpoint\EndpointTable`). The pre-2026 host
 names still work: `new Connection(..., legacyDomain: true)` uses mojedatovaschranka.cz / czebox.cz.
-Timeouts, a different CA file or user agent: pass a `Transport\TransportOptions`.
+`Transport\TransportOptions` carries the knobs: `connectTimeout`, `timeout`, `vodzTimeout` (large
+transfers, default 1800 s), `maxResponseBytes` (cap for a response held in memory, default 8 MB),
+`caFile`, `userAgent` and `tempDir`.
 
 ## Services
 
@@ -100,6 +102,22 @@ way to list without delivering under such a login; use a `PRIVIL_VIEW_INFO`-only
 without delivering. `MarkMessageAsDownloaded` only sets state 7 and has no legal effect.
 `ConfirmDelivery` no longer exists in ISDS (removed in WSDL 2.33) and is not offered by this library.
 
+### Raw responses
+
+Operations whose output no DTO covers yet (`Manipulations::*`, `Search::isdsSearch3()`, …) return the
+status-checked `\stdClass` that ext-soap produced. Read repeated elements through `Internal\Normalize`,
+never by direct property access — ext-soap gives you `null`, a single object or an array depending on how
+many there are:
+
+```php
+use MichalCharvat\CzechDataBox\Internal\Normalize;
+
+$result = $isds->search()->isdsSearch3('ACME');
+foreach (Normalize::list($result->dbResults, 'dbResult') as $box) {   // works for 0, 1 and many
+    echo $box->dbID, ' ', $box->dbName, PHP_EOL;
+}
+```
+
 ## Errors
 
 Everything throws `Exception\IsdsException` (extends `RuntimeException`) carrying `$isdsCode`,
@@ -107,7 +125,8 @@ Everything throws `Exception\IsdsException` (extends `RuntimeException`) carryin
 `RateLimited` (3008, 3009, 3013), `DeliveryInProgress` (3006), `NotYetDelivered` (1222),
 `NotAvailableYet` (1229, 2352), `WrongMessageKind` (1281), `MessageNotFound` (1211, 1600),
 `MessageErased` (1219), `ServiceUnavailable` (network, timeout, unexpected HTTP status),
-`InvalidZfo`. Status codes `00xx` are successes, so an empty search result (0002) or a partial
+`InvalidZfo`, and `MalformedResponse` when ISDS reports success but the payload lacks an element the
+WSDL promises. Status codes `00xx` are successes, so an empty search result (0002) or a partial
 `CreateMultipleMessage` (0004, per-recipient statuses in `dmMultipleStatus`) does not throw.
 
 ## Large messages (VoDZ)
@@ -149,8 +168,10 @@ file and total size, XML depth, element count and in-memory size. `parseStream()
 
 - TLS 1.2+, peer and host verification always on, bundled CA file.
 - Passwords and PEM data are `#[\SensitiveParameter]` and hidden from `var_dump`/`print_r` via
-  `__debugInfo()`. On **PHP 8.1** that attribute is ignored, so set `zend.exception_ignore_args=1`
-  (the php.ini-production default) to keep credentials out of exception traces.
+  `__debugInfo()`. A SOAP fault is re-created inside the library before being chained, so the
+  `SoapClient::__soapCall` frame (which holds the request parameters and cannot be redacted) never
+  reaches an exception trace. On **PHP 8.1** the attribute is ignored, so set
+  `zend.exception_ignore_args=1` (the php.ini-production default) to keep credentials out of traces.
 - Message content is never written to disk, except: 0600 temp files while openssl unwraps a CMS
   document (`Zfo`), and a 0600 client-certificate file only on cURL builds without
   `CURLOPT_SSLCERT_BLOB`. Both are deleted immediately.

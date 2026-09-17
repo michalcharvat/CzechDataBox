@@ -124,7 +124,8 @@ final class Search extends AbstractService
     /** Raw response: constRecords/constRecord (cName, cValue, cFrom, cTo). */
     public function getConstants(?\DateTimeInterface $date = null): \stdClass
     {
-        return $this->call('GetConstants', $date === null ? [] : ['constDate' => $date->format('Y-m-d')]);
+        // constDate is required (nillable): send it explicitly, an empty params array would drop the element
+        return $this->call('GetConstants', ['constDate' => $date?->format('Y-m-d')]);
     }
 
     /** @return array<string, mixed> */

@@ -51,7 +51,7 @@ final class CmsUnwrapper
         try {
             $validTo = $validFrom = $subject = null;
             if (@openssl_cms_verify($in, OPENSSL_CMS_NOVERIFY | OPENSSL_CMS_BINARY, $certs, [], null, null, null, null, OPENSSL_ENCODING_DER)) {
-                $x = openssl_x509_parse((string)file_get_contents($certs));
+                $x = self::parseSignerCertificate((string)file_get_contents($certs));
                 if (is_array($x)) {
                     $validFrom = (new \DateTimeImmutable('@' . $x['validFrom_time_t']));
                     $validTo = (new \DateTimeImmutable('@' . $x['validTo_time_t']));
@@ -100,15 +100,40 @@ final class CmsUnwrapper
         }
     }
 
+    /**
+     * ContentInfo → [0] SignedData → signerInfos (last child) → SignerInfo → [0] signedAttrs
+     * → Attribute { OID signingTime, SET { UTCTime | GeneralizedTime } }.
+     */
     private function signingTime(string $der): ?\DateTimeImmutable
     {
-        $p = strpos($der, self::OID_SIGNING_TIME);
-        if ($p === false) {
-            return null;
+        try {
+            $signedData = Der::children($der, Der::children($der, Der::read($der, 0))[1])[0];
+            $children = Der::children($der, $signedData);
+            $signerInfos = end($children);                       // SET OF SignerInfo
+            if ($signerInfos === false || $signerInfos['tag'] !== 0x11) {
+                return null;
+            }
+            $signerInfo = Der::children($der, $signerInfos)[0] ?? null;
+            if ($signerInfo === null) {
+                return null;
+            }
+            $time = null;
+            foreach (Der::children($der, $signerInfo) as $field) {
+                if ($field['class'] !== 2 || $field['tag'] !== 0) {   // [0] IMPLICIT signedAttrs
+                    continue;
+                }
+                foreach (Der::children($der, $field) as $attribute) {
+                    $parts = Der::children($der, $attribute);
+                    if (count($parts) < 2 || Der::content($der, $parts[0]) !== self::OID_SIGNING_TIME) {
+                        continue;
+                    }
+                    $time = Der::children($der, $parts[1])[0] ?? null;
+                    break 2;
+                }
+            }
+        } catch (\Throwable) {
+            return null;                                         // signing time is informational
         }
-        // OID (06 09 …) is followed by SET { UTCTime | GeneralizedTime }
-        $set = Der::read($der, $p + strlen(self::OID_SIGNING_TIME));
-        $time = Der::children($der, $set)[0] ?? null;
         if ($time === null) {
             return null;
         }
@@ -119,6 +144,30 @@ final class CmsUnwrapper
         return $dt ?: null;
     }
 
+    /**
+     * openssl writes the whole CMS certificate set; the signer is the end entity, so prefer a
+     * certificate that is not a CA over the file order.
+     *
+     * @return array<string, mixed>|null
+     */
+    private static function parseSignerCertificate(string $pemBundle): ?array
+    {
+        preg_match_all('/-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----/s', $pemBundle, $m);
+        $first = null;
+        foreach ($m[0] as $pem) {
+            $x = openssl_x509_parse($pem);
+            if (!is_array($x)) {
+                continue;
+            }
+            $first ??= $x;
+            $ca = $x['extensions']['basicConstraints'] ?? '';
+            if (!is_string($ca) || !str_contains($ca, 'CA:TRUE')) {
+                return $x;
+            }
+        }
+        return $first;
+    }
+
     private function temp(string $content): string
     {
         $path = tempnam($this->tempDir ?? sys_get_temp_dir(), 'isds-zfo-');
@@ -126,7 +175,10 @@ final class CmsUnwrapper
             throw new \RuntimeException('Cannot create ZFO temp file');
         }
         chmod($path, 0600);
-        file_put_contents($path, $content);
+        if (file_put_contents($path, $content) !== strlen($content)) {
+            @unlink($path);
+            throw new \RuntimeException('Cannot write ZFO temp file (disk full?)');
+        }
         return $path;
     }
 

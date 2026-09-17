@@ -26,6 +26,9 @@ Rewrite for ISDS WSDL 3.10. See [UPGRADE-2.0.md](UPGRADE-2.0.md).
 
 ### Changed
 - Package `michalcharvat/czech-data-box`, namespace `MichalCharvat\CzechDataBox`, PHP ≥ 8.1.
+- `Internal\Normalize` is public API: it is how consumers read the raw `\stdClass` responses safely.
+- A malformed but "successful" response raises `Exception\MalformedResponse` instead of an SPL exception.
+- `ListFilter` no longer caps `dmLimit` at 1000 (ISDS allows more) and rejects `dmOffset < 1` (it counts from 1).
 - Hosts moved to datovka.gov.cz / datovka-test.gov.cz; the old names are available via `legacyDomain: true`.
 
 ### Removed

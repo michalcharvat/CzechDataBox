@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MichalCharvat\CzechDataBox\Tests\Unit\Internal;
 
+use MichalCharvat\CzechDataBox\Exception\MalformedResponse;
 use MichalCharvat\CzechDataBox\Internal\Normalize;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -68,7 +69,7 @@ final class NormalizeTest extends TestCase
     public function testDateTimeNullAndGarbage(): void
     {
         self::assertNull(Normalize::dateTime((object)[], 't'));
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(MalformedResponse::class);
         Normalize::dateTime((object)['t' => 'yesterday-ish'], 't');
     }
 

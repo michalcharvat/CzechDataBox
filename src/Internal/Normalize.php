@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace MichalCharvat\CzechDataBox\Internal;
 
+use MichalCharvat\CzechDataBox\Exception\MalformedResponse;
+
 /**
  * Reads values out of the stdClass trees ext-soap produces (no classmap).
  * Every repeated XSD element must go through list(): ext-soap returns null,
  * a single object or an array depending on the count, whatever the
  * SOAP_SINGLE_ELEMENT_ARRAYS feature promises.
  *
- * @internal
+ * Public API: the service methods that return the raw response (Search::isdsSearch3(),
+ * Manipulations::*, …) hand out those trees, so consumers need the same readers.
  */
 final class Normalize
 {
@@ -29,7 +32,9 @@ final class Normalize
             return [];
         }
         if (is_array($raw)) {
-            return array_values(array_filter($raw, static fn(mixed $v): bool => $v instanceof \stdClass));
+            // Every maxOccurs="unbounded" element in WSDL 3.10 is a complex type, so keeping only
+        // stdClass entries is safe here (repeated simple-typed elements do not exist in this schema set).
+        return array_values(array_filter($raw, static fn(mixed $v): bool => $v instanceof \stdClass));
         }
         if ($raw instanceof \stdClass) {
             return get_object_vars($raw) === [] ? [] : [$raw];
@@ -93,7 +98,7 @@ final class Normalize
         }
         $d = \DateTimeImmutable::createFromFormat('!Y-m-d', substr($s, 0, 10), new \DateTimeZone('UTC'));
         if ($d === false) {
-            throw new \UnexpectedValueException('Invalid ISDS date: ' . $s);
+            throw new MalformedResponse(null, 'Invalid ISDS date: ' . $s, 'response');
         }
         return $d;
     }
@@ -104,7 +109,7 @@ final class Normalize
         try {
             $dt = new \DateTimeImmutable($s, $hasZone ? null : new \DateTimeZone(self::ISDS_ZONE));
         } catch (\Exception $e) {
-            throw new \UnexpectedValueException('Invalid ISDS date-time: ' . $s, 0, $e);
+            throw new MalformedResponse(null, 'Invalid ISDS date-time: ' . $s, 'response', $e);
         }
         return $dt->setTimezone(new \DateTimeZone('UTC'));
     }

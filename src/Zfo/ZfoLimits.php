@@ -13,6 +13,8 @@ final class ZfoLimits
         public readonly int $maxDepth = 32,
         public readonly int $maxElements = 20_000,
         public readonly int $maxInMemoryBytes = 30 * 1024 * 1024, // parse(): normal messages ≤ 20 MB
+        /** parseStream(): cap on the ZFO buffered to disk before unwrapping. */
+        public readonly int $maxZfoBytes = 200 * 1024 * 1024,
     ) {
     }
 }

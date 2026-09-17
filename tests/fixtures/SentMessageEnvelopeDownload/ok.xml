@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:SentMessageEnvelopeDownloadResponse>
+      <p:dmReturnedMessageEnvelope dmType="V" attsNum="1">
+        <p:dmDm>
+          <p:dmID>7654321</p:dmID>
+          <p:dbIDSender>ximacm6</p:dbIDSender>
+          <p:dmSender>Odesílatel</p:dmSender>
+          <p:dmAnnotation>Odeslaná zpráva</p:dmAnnotation>
+        </p:dmDm>
+        <p:dmHash algorithm="SHA-256">aGFzaA==</p:dmHash>
+        <p:dmQTimestamp>dGltZXN0YW1w</p:dmQTimestamp>
+        <p:dmDeliveryTime>2026-09-01T10:00:00.000+02:00</p:dmDeliveryTime>
+        <p:dmAcceptanceTime xsi:nil="true"/>
+        <p:dmMessageStatus>4</p:dmMessageStatus>
+        <p:dmAttachmentSize>1</p:dmAttachmentSize>
+      </p:dmReturnedMessageEnvelope>
+      <p:dmStatus><p:dmStatusCode>0000</p:dmStatusCode><p:dmStatusMessage>Provedeno úspěšně.</p:dmStatusMessage></p:dmStatus>
+    </p:SentMessageEnvelopeDownloadResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

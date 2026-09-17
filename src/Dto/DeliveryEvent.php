@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MichalCharvat\CzechDataBox\Dto;
 
+use MichalCharvat\CzechDataBox\Exception\MalformedResponse;
 use MichalCharvat\CzechDataBox\Internal\Normalize as N;
 
 final class DeliveryEvent
@@ -17,7 +18,7 @@ final class DeliveryEvent
 
     public static function fromRaw(\stdClass $e): self
     {
-        $time = N::dateTime($e, 'dmEventTime') ?? throw new \UnexpectedValueException('dmEvent without dmEventTime');
+        $time = N::dateTime($e, 'dmEventTime') ?? throw new MalformedResponse(null, 'dmEvent without dmEventTime', 'response');
         return new self($time, N::string($e, 'dmEventDescr') ?? '', $e);
     }
 

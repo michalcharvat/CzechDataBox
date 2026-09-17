@@ -20,6 +20,8 @@ final class Connection
     private array $transports = [];
     /** @var array<string, object> */
     private array $services = [];
+    /** @var array<string, VodzTransport> */
+    private array $vodzTransports = [];
     /** @var (\Closure(Service, string): TransportInterface)|null */
     private readonly ?\Closure $transportFactory;
 
@@ -65,7 +67,7 @@ final class Connection
     public function archive(): Svc\Archive
     {
         /** @var Svc\Archive */
-        return $this->services['arch'] ??= new Svc\Archive($this->vodzTransport(Service::Archive));
+        return $this->services[Service::Archive->name] ??= new Svc\Archive($this->vodzTransport(Service::Archive));
     }
 
     /** OTP accounts only: build this Connection with password . otpCode as the Basic-auth password. */
@@ -77,7 +79,7 @@ final class Connection
     public function bigMessages(): Svc\BigMessages
     {
         /** @var Svc\BigMessages */
-        return $this->services['vodz'] ??= new Svc\BigMessages($this->vodzTransport(Service::BigMessages));
+        return $this->services[Service::BigMessages->name] ??= new Svc\BigMessages($this->vodzTransport(Service::BigMessages));
     }
 
     /**
@@ -105,10 +107,13 @@ final class Connection
 
     private function vodzTransport(Service $service): VodzTransport
     {
-        $url = EndpointTable::url($this->environment, $this->legacyDomain, $this->credentials->kind(), $service);
-        return $this->vodzTransportFactory !== null
-            ? ($this->vodzTransportFactory)($service, $url)
-            : new VodzTransport($url, $this->credentials, $this->options);
+        if (!isset($this->vodzTransports[$service->name])) {
+            $url = EndpointTable::url($this->environment, $this->legacyDomain, $this->credentials->kind(), $service);
+            $this->vodzTransports[$service->name] = $this->vodzTransportFactory !== null
+                ? ($this->vodzTransportFactory)($service, $url)
+                : new VodzTransport($url, $this->credentials, $this->options);
+        }
+        return $this->vodzTransports[$service->name];
     }
 
     /** @return array<string, mixed> */

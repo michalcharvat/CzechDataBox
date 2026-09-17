@@ -97,7 +97,11 @@ final class BigMessages extends AbstractMtomService
                 $this->assertReceived($op, $cid, $cids);
                 $file->dmEncodedContent = null;
             } elseif (is_string($content)) {
-                $file->dmEncodedContent = base64_decode($content, true) ?: '';
+                $decoded = base64_decode($content, true);
+                if ($decoded === false) {
+                    throw new IsdsException(null, 'Invalid base64 in dmEncodedContent', $op);
+                }
+                $file->dmEncodedContent = $decoded;
             }
             $contentIds[] = $cid;
         }

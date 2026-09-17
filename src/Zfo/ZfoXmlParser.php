@@ -10,14 +10,17 @@ use MichalCharvat\CzechDataBox\Exception\InvalidZfo;
  * Streaming expat parser for the inner ZFO XML. Collects every non-file leaf element as a scalar field
  * (local name → text), the attributes of the returned message/delivery element, dmHash's algorithm,
  * dmEvent entries, and streams each dmEncodedContent through a base64 decoder into a caller-provided sink.
- * Element names are matched by local name only. DOCTYPE/ENTITY declarations are rejected.
+ * Element names are matched by local name only. DOCTYPE and ENTITY declarations are rejected by scanning
+ * the prolog (PHP's expat binding does not hand the doctype to any handler); internal entity references are
+ * never expanded into character data, and no external entity is ever resolved.
  *
  * @internal
  */
 final class ZfoXmlParser
 {
     private const SEP = '|';
-    private const HEAD_LIMIT = 65_536;
+    /** A ZFO prolog is a declaration and maybe a comment; anything larger is not legitimate. */
+    private const MAX_PROLOG = 1_048_576;
 
     private \XMLParser $parser;
     private int $depth = 0;
@@ -54,17 +57,20 @@ final class ZfoXmlParser
         xml_parser_set_option($p, XML_OPTION_CASE_FOLDING, 0);
         xml_set_element_handler($p, $this->start(...), $this->end(...));
         xml_set_character_data_handler($p, $this->chars(...));
-        xml_set_default_handler($p, $this->other(...));
         $this->parser = $p;
     }
 
     public function feed(string $chunk, bool $final = false): void
     {
-        if ($this->rootNs === null && strlen($this->head) < self::HEAD_LIMIT) {
-            // before the root element: look for declarations across chunk boundaries
+        if ($this->rootNs === null) {
+            // Everything before the root element is scanned for declarations, across chunk boundaries:
+            // PHP's expat binding never reports the doctype to the default handler, so this is the only guard.
             $this->head .= $chunk;
             if (stripos($this->head, '<!DOCTYPE') !== false || stripos($this->head, '<!ENTITY') !== false) {
                 throw new InvalidZfo(null, 'DOCTYPE/ENTITY not allowed in ZFO', 'Zfo');
+            }
+            if (strlen($this->head) > self::MAX_PROLOG) {
+                throw new InvalidZfo(null, 'XML prolog too large', 'Zfo');
             }
         }
         if ($this->stopAfterRoot && $this->rootNs !== null) {
@@ -177,13 +183,6 @@ final class ZfoXmlParser
             $this->fields[$local] = trim($this->text);
         }
         $this->text = '';
-    }
-
-    private function other(\XMLParser $p, string $data): void
-    {
-        if (stripos($data, '<!DOCTYPE') === 0 || stripos($data, '<!ENTITY') === 0) {
-            throw new InvalidZfo(null, 'DOCTYPE/ENTITY not allowed in ZFO', 'Zfo');
-        }
     }
 
     private function writeBase64(string $data, bool $flush = false): void

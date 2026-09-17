@@ -29,20 +29,8 @@ enum Service
         };
     }
 
-    public function pathSuffix(): string
-    {
-        return match ($this) {
-            self::Operations => 'dz',
-            self::Info => 'dx',
-            self::Search => 'df',
-            self::Access, self::Manipulations => 'DsManage',
-            self::BigMessages => 'vodz',
-            self::Archive => 'arch',
-            self::ChangePassword => 'changePassword',
-        };
-    }
-
-    public function isSecondaryHost(): bool
+    /** ws2 endpoints speak SOAP 1.2 with MTOM (VodzTransport), the others SOAP 1.1. */
+    public function isMtom(): bool
     {
         return $this === self::BigMessages || $this === self::Archive;
     }
