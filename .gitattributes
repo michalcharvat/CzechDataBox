@@ -1,0 +1,10 @@
+# Keep the distributed package small: a consumer needs src/ and resources/ only.
+# (GO modules commit their vendor tree, so every excluded file would be committed
+# into every module that bundles this client.)
+/tests           export-ignore
+/docs            export-ignore
+/.github         export-ignore
+/.gitattributes  export-ignore
+/phpunit.xml.dist   export-ignore
+/phpstan.neon.dist  export-ignore
+/UPGRADE-2.0.md  export-ignore
