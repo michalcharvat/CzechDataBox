@@ -16,8 +16,8 @@ abstract class AbstractService
     {
     }
 
-    /** @param array<string, mixed> $params */
-    protected function call(string $operation, array $params = []): \stdClass
+    /** @param array<string, mixed> $params may hold passwords — never part of exception traces (PHP ≥ 8.2) */
+    protected function call(string $operation, #[\SensitiveParameter] array $params = []): \stdClass
     {
         return StatusGuard::check($this->transport->call($operation, $params), $operation);
     }

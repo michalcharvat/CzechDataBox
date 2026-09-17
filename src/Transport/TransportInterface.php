@@ -12,5 +12,5 @@ interface TransportInterface
      * @param array<string, mixed> $params
      * @throws \MichalCharvat\CzechDataBox\Exception\IsdsException
      */
-    public function call(string $operation, array $params): \stdClass;
+    public function call(string $operation, #[\SensitiveParameter] array $params): \stdClass;
 }

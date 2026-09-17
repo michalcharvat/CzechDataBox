@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:GetUserInfoFromLogin2Response>
+      <p:dbUserInfo>
+        <p:aifoIsds>false</p:aifoIsds>
+        <p:pnGivenNames>Jana</p:pnGivenNames>
+        <p:pnLastName>Nováková</p:pnLastName>
+        <p:adCode xsi:nil="true"/>
+        <p:adCity xsi:nil="true"/>
+        <p:adDistrict xsi:nil="true"/>
+        <p:adStreet xsi:nil="true"/>
+        <p:adNumberInStreet xsi:nil="true"/>
+        <p:adNumberInMunicipality xsi:nil="true"/>
+        <p:adZipCode xsi:nil="true"/>
+        <p:adState xsi:nil="true"/>
+        <p:biDate>1990-05-01</p:biDate>
+        <p:isdsID>u7x8y9z</p:isdsID>
+        <p:userType>ENTRUSTED_USER</p:userType>
+        <p:userPrivils>1</p:userPrivils>
+        <p:ic xsi:nil="true"/>
+        <p:firmName xsi:nil="true"/>
+        <p:caStreet xsi:nil="true"/>
+        <p:caCity xsi:nil="true"/>
+        <p:caZipCode xsi:nil="true"/>
+      </p:dbUserInfo>
+      <p:dbStatus><p:dbStatusCode>0000</p:dbStatusCode><p:dbStatusMessage>Provedeno úspěšně.</p:dbStatusMessage></p:dbStatus>
+    </p:GetUserInfoFromLogin2Response>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

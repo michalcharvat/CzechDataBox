@@ -49,7 +49,7 @@ class CurlSoapClient extends \SoapClient
         return $e;
     }
 
-    public function __doRequest(string $request, string $location, string $action, int $version, bool $oneWay = false): ?string
+    public function __doRequest(#[\SensitiveParameter] string $request, string $location, string $action, int $version, bool $oneWay = false): ?string
     {
         $ch = curl_init($this->location);
         $headers = ['Content-Type: text/xml; charset=utf-8', 'SOAPAction: "' . $action . '"'];

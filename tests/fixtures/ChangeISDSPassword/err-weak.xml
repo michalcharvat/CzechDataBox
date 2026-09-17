@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:ChangeISDSPasswordResponse>
+      <p:dbStatus><p:dbStatusCode>1080</p:dbStatusCode><p:dbStatusMessage>Nové heslo musí obsahovat alespoň jedno velké písmeno, malé písmeno i číslici.</p:dbStatusMessage></p:dbStatus>
+    </p:ChangeISDSPasswordResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

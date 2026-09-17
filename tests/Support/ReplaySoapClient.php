@@ -28,7 +28,7 @@ final class ReplaySoapClient extends CurlSoapClient
         $this->op = $operation;
     }
 
-    public function __doRequest(string $request, string $location, string $action, int $version, bool $oneWay = false): ?string
+    public function __doRequest(#[\SensitiveParameter] string $request, string $location, string $action, int $version, bool $oneWay = false): ?string
     {
         $this->requests[] = [$this->op, $request];
         if (empty($this->queue[$this->op])) {

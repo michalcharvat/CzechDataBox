@@ -14,6 +14,7 @@ final class EndpointTable
      * WS manual 3.8.1 ch. 1.2.1.1 (baseURL per login kind: ws1 / ws1c/cert / ws1c/certds / ws1c/hspis),
      * 1.2.2.1 (ws2 / ws2c/.../DS/vodz), 1.2.3 + ArchiveISDSDocument (ws2c/cert/DS/arch "atd."),
      * test = datovka-test.gov.cz, legacy mojedatovaschranka.cz / czebox.cz "still usable" (docs/sources.md).
+     * ChangePassword (ChangePasswordOTP/SendSMSCode): OTP manual 3.1.1, www host, password logins only.
      * Missing entry = combination not offered by ISDS.
      *
      * @var array<string, array<string, array<string, string>>>
@@ -28,6 +29,7 @@ final class EndpointTable
                 'Manipulations' => 'https://ws1.datovka.gov.cz/DS/DsManage',
                 'BigMessages' => 'https://ws2.datovka.gov.cz/DS/vodz',
                 'Archive' => 'https://ws2.datovka.gov.cz/DS/arch',
+                'ChangePassword' => 'https://www.datovka.gov.cz/asws/changePassword',
             ],
             'SystemCertificate' => [
                 'Operations' => 'https://ws1c.datovka.gov.cz/cert/DS/dz',
@@ -66,6 +68,7 @@ final class EndpointTable
                 'Manipulations' => 'https://ws1.datovka-test.gov.cz/DS/DsManage',
                 'BigMessages' => 'https://ws2.datovka-test.gov.cz/DS/vodz',
                 'Archive' => 'https://ws2.datovka-test.gov.cz/DS/arch',
+                'ChangePassword' => 'https://www.datovka-test.gov.cz/asws/changePassword',
             ],
             'SystemCertificate' => [
                 'Operations' => 'https://ws1c.datovka-test.gov.cz/cert/DS/dz',
@@ -104,6 +107,7 @@ final class EndpointTable
                 'Manipulations' => 'https://ws1.mojedatovaschranka.cz/DS/DsManage',
                 'BigMessages' => 'https://ws2.mojedatovaschranka.cz/DS/vodz',
                 'Archive' => 'https://ws2.mojedatovaschranka.cz/DS/arch',
+                'ChangePassword' => 'https://www.mojedatovaschranka.cz/asws/changePassword',
             ],
             'SystemCertificate' => [
                 'Operations' => 'https://ws1c.mojedatovaschranka.cz/cert/DS/dz',
@@ -142,6 +146,7 @@ final class EndpointTable
                 'Manipulations' => 'https://ws1.czebox.cz/DS/DsManage',
                 'BigMessages' => 'https://ws2.czebox.cz/DS/vodz',
                 'Archive' => 'https://ws2.czebox.cz/DS/arch',
+                'ChangePassword' => 'https://www.czebox.cz/asws/changePassword',
             ],
             'SystemCertificate' => [
                 'Operations' => 'https://ws1c.czebox.cz/cert/DS/dz',

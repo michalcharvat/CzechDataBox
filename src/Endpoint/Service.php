@@ -13,6 +13,7 @@ enum Service
     case Manipulations;   // db_manipulations — same URL as Access, distinct WSDL
     case BigMessages;
     case Archive;
+    case ChangePassword;  // OTP logins only (www…/asws/changePassword)
 
     public function wsdl(): string
     {
@@ -24,6 +25,7 @@ enum Service
             self::Manipulations => 'db_manipulations.wsdl',
             self::BigMessages => 'dm_VoDZ.wsdl',
             self::Archive => 'dm_arch.wsdl',
+            self::ChangePassword => 'ChangePassword.wsdl',
         };
     }
 
@@ -36,6 +38,7 @@ enum Service
             self::Access, self::Manipulations => 'DsManage',
             self::BigMessages => 'vodz',
             self::Archive => 'arch',
+            self::ChangePassword => 'changePassword',
         };
     }
 

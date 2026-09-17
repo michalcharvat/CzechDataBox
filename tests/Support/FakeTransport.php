@@ -31,7 +31,7 @@ final class FakeTransport implements TransportInterface
         return $this;
     }
 
-    public function call(string $operation, array $params): \stdClass
+    public function call(string $operation, #[\SensitiveParameter] array $params): \stdClass
     {
         return (new SoapTransport($this->client))->call($operation, $params);
     }

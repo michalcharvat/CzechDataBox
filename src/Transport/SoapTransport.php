@@ -13,7 +13,7 @@ final class SoapTransport implements TransportInterface
     {
     }
 
-    public function call(string $operation, array $params): \stdClass
+    public function call(string $operation, #[\SensitiveParameter] array $params): \stdClass
     {
         $this->client->beginOperation($operation);
         try {

@@ -67,6 +67,12 @@ final class Connection
         return $this->service(Service::Archive, Svc\Archive::class);
     }
 
+    /** OTP accounts only: build this Connection with password . otpCode as the Basic-auth password. */
+    public function passwordChange(): Svc\PasswordChange
+    {
+        return $this->service(Service::ChangePassword, Svc\PasswordChange::class);
+    }
+
     public function bigMessages(): Svc\BigMessages
     {
         /** @var Svc\BigMessages */

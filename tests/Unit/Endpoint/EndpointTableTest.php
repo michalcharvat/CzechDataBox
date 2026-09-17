@@ -129,6 +129,22 @@ final class EndpointTableTest extends TestCase
         yield 'test-legacy HostedRecordsService Manipulations' => [Environment::Test, true, AuthKind::HostedRecordsService, Service::Manipulations, 'https://ws1c.czebox.cz/hspis/DS/DsManage'];
         yield 'test-legacy HostedRecordsService BigMessages' => [Environment::Test, true, AuthKind::HostedRecordsService, Service::BigMessages, 'https://ws2c.czebox.cz/hspis/DS/vodz'];
         yield 'test-legacy HostedRecordsService Archive' => [Environment::Test, true, AuthKind::HostedRecordsService, Service::Archive, 'https://ws2c.czebox.cz/hspis/DS/arch'];
+        yield 'prod Password ChangePassword' => [Environment::Production, false, AuthKind::Password, Service::ChangePassword, 'https://www.datovka.gov.cz/asws/changePassword'];
+        yield 'prod SystemCertificate ChangePassword' => [Environment::Production, false, AuthKind::SystemCertificate, Service::ChangePassword, ''];
+        yield 'prod CertificateAndPassword ChangePassword' => [Environment::Production, false, AuthKind::CertificateAndPassword, Service::ChangePassword, ''];
+        yield 'prod HostedRecordsService ChangePassword' => [Environment::Production, false, AuthKind::HostedRecordsService, Service::ChangePassword, ''];
+        yield 'test Password ChangePassword' => [Environment::Test, false, AuthKind::Password, Service::ChangePassword, 'https://www.datovka-test.gov.cz/asws/changePassword'];
+        yield 'test SystemCertificate ChangePassword' => [Environment::Test, false, AuthKind::SystemCertificate, Service::ChangePassword, ''];
+        yield 'test CertificateAndPassword ChangePassword' => [Environment::Test, false, AuthKind::CertificateAndPassword, Service::ChangePassword, ''];
+        yield 'test HostedRecordsService ChangePassword' => [Environment::Test, false, AuthKind::HostedRecordsService, Service::ChangePassword, ''];
+        yield 'prod-legacy Password ChangePassword' => [Environment::Production, true, AuthKind::Password, Service::ChangePassword, 'https://www.mojedatovaschranka.cz/asws/changePassword'];
+        yield 'prod-legacy SystemCertificate ChangePassword' => [Environment::Production, true, AuthKind::SystemCertificate, Service::ChangePassword, ''];
+        yield 'prod-legacy CertificateAndPassword ChangePassword' => [Environment::Production, true, AuthKind::CertificateAndPassword, Service::ChangePassword, ''];
+        yield 'prod-legacy HostedRecordsService ChangePassword' => [Environment::Production, true, AuthKind::HostedRecordsService, Service::ChangePassword, ''];
+        yield 'test-legacy Password ChangePassword' => [Environment::Test, true, AuthKind::Password, Service::ChangePassword, 'https://www.czebox.cz/asws/changePassword'];
+        yield 'test-legacy SystemCertificate ChangePassword' => [Environment::Test, true, AuthKind::SystemCertificate, Service::ChangePassword, ''];
+        yield 'test-legacy CertificateAndPassword ChangePassword' => [Environment::Test, true, AuthKind::CertificateAndPassword, Service::ChangePassword, ''];
+        yield 'test-legacy HostedRecordsService ChangePassword' => [Environment::Test, true, AuthKind::HostedRecordsService, Service::ChangePassword, ''];
     }
 
     #[DataProvider('cells')]
