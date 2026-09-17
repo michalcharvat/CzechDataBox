@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 (unreleased)
+## 2.0.0 (2026-09-18)
 
 Rewrite for ISDS WSDL 3.10. See [UPGRADE-2.0.md](UPGRADE-2.0.md).
 
