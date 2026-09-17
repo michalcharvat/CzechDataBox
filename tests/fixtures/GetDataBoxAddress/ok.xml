@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Body>
+    <p:GetDataBoxAddressResponse xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <p:adCode>22251057</p:adCode>
+      <p:adCity>Praha 6</p:adCity>
+      <p:adDistrict>Řepy</p:adDistrict>
+      <p:adStreet>Bazovského</p:adStreet>
+      <p:adNumberInStreet>7</p:adNumberInStreet>
+      <p:adNumberInMunicipality>1117</p:adNumberInMunicipality>
+      <p:adZipCode>16300</p:adZipCode>
+      <p:adState>CZ</p:adState>
+      <p:adRegistrationNumber xsi:nil="true"/>
+      <p:adFullAddress1>Bazovského 1117/7, Řepy, 16300 Praha 6</p:adFullAddress1>
+      <p:adFullAddress2>Bazovského 1117/7~Řepy~16300 Praha 6</p:adFullAddress2>
+      <p:dbStatus>
+        <p:dbStatusCode>0000</p:dbStatusCode>
+        <p:dbStatusMessage>Provedeno úspěšně.</p:dbStatusMessage>
+      </p:dbStatus>
+    </p:GetDataBoxAddressResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

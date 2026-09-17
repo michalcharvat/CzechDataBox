@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:GetDataBoxActivityStatusResponse>
+      <p:dbID>abc1231</p:dbID>
+      <p:Periods>
+        <p:Period>
+          <p:PeriodFrom>2026-01-01T00:00:00.000+01:00</p:PeriodFrom>
+          <p:PeriodTo>2026-09-17T00:00:00.000+02:00</p:PeriodTo>
+          <p:DbState>1</p:DbState>
+        </p:Period>
+      </p:Periods>
+      <p:dbStatus><p:dbStatusCode>0000</p:dbStatusCode><p:dbStatusMessage>Provedeno úspěšně.</p:dbStatusMessage></p:dbStatus>
+    </p:GetDataBoxActivityStatusResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

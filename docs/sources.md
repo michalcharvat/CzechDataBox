@@ -68,3 +68,11 @@ WS manual 3.8.1, ch. 1.2.1.1 baseURL per login kind, 1.2.2.1 VoDZ, 1.2.3 archive
 are confirmed only once a live certificate login exercises them. All 16 host names resolve and verify
 against `resources/ca/isds-ca-bundle.pem` (2026-09-17). Not modelled: `www.datovka.gov.cz/apps` (OTP/mobile key),
 `ws1c/hssu` (§14a access interface), `*.datovka.cms2.cz` (KIVS network).
+
+## Local patches to the bundled WSDL/XSD
+
+| File | Patch | Why |
+|---|---|---|
+| `dbTypes.xsd` `tGetAddressOutput` | added optional `dbStatus` (`tns:tDbReqStatus`) | upstream schema omits it although ISDS returns it (WS search manual 3.8.1, GetDataBoxAddress sample); ext-soap drops undeclared elements, so the status (0000 / 0009 / errors) was invisible. Every other operation output declares its status (checked by script 2026-09-17). |
+
+When refreshing the WSDL set, re-apply every patch in this table (search for `LOCAL PATCH`).

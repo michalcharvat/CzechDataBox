@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:DataBoxCreditInfoResponse>
+      <p:currentCredit>12500</p:currentCredit>
+      <p:notifEmail>ucetni@example.cz</p:notifEmail>
+      <p:ciRecords>
+        <p:ciRecord>
+          <p:ciEventTime>2026-09-01T10:00:00.000+02:00</p:ciEventTime>
+          <p:ciEventType>1</p:ciEventType>
+          <p:ciCreditChange>50000</p:ciCreditChange>
+          <p:ciCreditAfter>62500</p:ciCreditAfter>
+          <p:ciTransID>T-1</p:ciTransID>
+        </p:ciRecord>
+      </p:ciRecords>
+      <p:dbStatus><p:dbStatusCode>0000</p:dbStatusCode><p:dbStatusMessage>Provedeno úspěšně.</p:dbStatusMessage></p:dbStatus>
+    </p:DataBoxCreditInfoResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

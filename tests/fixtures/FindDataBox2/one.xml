@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:p="http://isds.czechpoint.cz/v20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <p:FindDataBox2Response>
+      <p:dbResults>
+        <p:dbOwnerInfo>
+          <p:dbID>abc1231</p:dbID>
+          <p:aifoIsds>false</p:aifoIsds>
+          <p:dbType>PO</p:dbType>
+          <p:ic>12345671</p:ic>
+          <p:pnGivenNames xsi:nil="true"/>
+          <p:pnLastName xsi:nil="true"/>
+          <p:firmName>ACME s.r.o.</p:firmName>
+          <p:biDate xsi:nil="true"/>
+          <p:biCity xsi:nil="true"/>
+          <p:biCounty xsi:nil="true"/>
+          <p:biState xsi:nil="true"/>
+          <p:adCode>22251057</p:adCode>
+          <p:adCity>Praha 6</p:adCity>
+          <p:adDistrict>Řepy</p:adDistrict>
+          <p:adStreet>Bazovského</p:adStreet>
+          <p:adNumberInStreet>7</p:adNumberInStreet>
+          <p:adNumberInMunicipality>1117</p:adNumberInMunicipality>
+          <p:adZipCode>16300</p:adZipCode>
+          <p:adState>CZ</p:adState>
+          <p:nationality xsi:nil="true"/>
+          <p:dbIdOVM xsi:nil="true"/>
+          <p:dbState>1</p:dbState>
+          <p:dbOpenAddressing>false</p:dbOpenAddressing>
+          <p:dbUpperID xsi:nil="true"/>
+        </p:dbOwnerInfo>
+      </p:dbResults>
+      <p:dbStatus><p:dbStatusCode>0000</p:dbStatusCode><p:dbStatusMessage>Provedeno úspěšně.</p:dbStatusMessage></p:dbStatus>
+    </p:FindDataBox2Response>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

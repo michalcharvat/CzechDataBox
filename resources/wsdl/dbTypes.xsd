@@ -1788,6 +1788,9 @@
             <xs:element name="adRegistrationNumber" type="xs:string" nillable="true" />
             <xs:element name="adFullAddress1" type="xs:string" nillable="true" />
             <xs:element name="adFullAddress2" type="xs:string" nillable="true" />
+            <!-- LOCAL PATCH (michalcharvat/czech-data-box): upstream 3.10/3.11 omits dbStatus, but ISDS sends it
+                 (WS search manual 3.8.1, GetDataBoxAddress sample); without it ext-soap drops the status. -->
+            <xs:element name="dbStatus" type="tns:tDbReqStatus" minOccurs="0" />
         </xs:sequence>
     </xs:complexType>
 </xs:schema>
