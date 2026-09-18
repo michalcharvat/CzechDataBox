@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- VoDZ transport: a caller stream that fails mid-upload now aborts the transfer instead of waiting out
+  `vodzTimeout` (the progress callback never saw the error).
+- VoDZ transport works on PHP 8.1 again (`CURLOPT_XFERINFOFUNCTION` is PHP 8.2+; 8.1 uses
+  `CURLOPT_PROGRESSFUNCTION`).
+
 ## 2.0.0 (2026-09-18)
 
 Rewrite for ISDS WSDL 3.10. See [UPGRADE-2.0.md](UPGRADE-2.0.md).

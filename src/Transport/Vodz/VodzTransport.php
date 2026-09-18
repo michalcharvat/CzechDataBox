@@ -69,8 +69,13 @@ class VodzTransport
             },
             // PHP has no CURL_READFUNC_ABORT: '' only means EOF, which would leave cURL waiting out the
             // timeout for the body length it already promised. A non-zero progress callback aborts instead.
+            // By reference: an arrow fn would capture the initial null and never abort.
+            // CURLOPT_XFERINFOFUNCTION is PHP 8.2+; on 8.1 the older PROGRESSFUNCTION aborts the same way.
             CURLOPT_NOPROGRESS => false,
-            CURLOPT_XFERINFOFUNCTION => static fn(): int => $callbackError === null ? 0 : 1,
+            (\defined('CURLOPT_XFERINFOFUNCTION') ? \constant('CURLOPT_XFERINFOFUNCTION') : CURLOPT_PROGRESSFUNCTION)
+                => static function () use (&$callbackError): int {
+                    return $callbackError === null ? 0 : 1;
+                },
             CURLOPT_HTTPHEADER => [
                 'Content-Type: ' . $writer->contentType(),
                 'MIME-Version: 1.0',
