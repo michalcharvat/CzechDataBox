@@ -49,7 +49,7 @@ class CurlSoapClient extends \SoapClient
         return $e;
     }
 
-    public function __doRequest(#[\SensitiveParameter] string $request, string $location, string $action, int $version, bool $oneWay = false): ?string
+    public function __doRequest(#[\SensitiveParameter] string $request, string $location, string $action, int $version, bool $oneWay = false, ?string $uriParserClass = null): ?string
     {
         $ch = curl_init($this->location);
         $opts = [
@@ -65,7 +65,6 @@ class CurlSoapClient extends \SoapClient
         $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
         $errno = curl_errno($ch);
         $error = curl_error($ch);
-        curl_close($ch);
 
         $this->transportError = HttpErrorMapper::map($status, $errno, $error, $this->currentOperation);
         if ($this->transportError !== null || !is_string($body)) {

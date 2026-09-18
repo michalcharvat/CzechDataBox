@@ -1,8 +1,10 @@
 # Changelog
 
-## Unreleased
+## 2.0.1 (2026-09-19)
 
 ### Fixed
+- PHP 8.5: `CurlSoapClient::__doRequest` matches the new `SoapClient` signature (`$uriParserClass`),
+  which was a fatal error on load; the no-op `curl_close()` calls (deprecated in 8.5) are gone.
 - VoDZ transport: a caller stream that fails mid-upload now aborts the transfer instead of waiting out
   `vodzTimeout` (the progress callback never saw the error).
 - VoDZ transport works on PHP 8.1 again (`CURLOPT_XFERINFOFUNCTION` is PHP 8.2+; 8.1 uses
